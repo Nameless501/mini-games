@@ -1,0 +1,51 @@
+.link-button {
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    background-color: var(--color-crimson);
+    border: 1.5px solid var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10%;
+}
+
+.link-button:hover {
+    background-color: var(--color-white);
+    border: 1.5px solid var(--color-purple);
+    cursor: pointer;
+}
+
+.link-button:hover .link-button__line {
+    border-color: var(--color-purple);
+}
+
+.link-button__line {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    width: 50%;
+    border-bottom: 4px solid var(--color-white);
+    border-radius: 15px;
+    transform: rotate(0) transition(0, 0);
+    transition: transform .2s linear, width .1s linear .1s;
+}
+
+.link-button__line:nth-child(2) {
+    width: 60%
+}
+
+.link-button:hover .link-button__line:nth-child(1) {
+    transform: translate(-8px, 5.5px) rotate(-35deg);
+    width: 20%;
+    transition: transform .2s linear .1s, width .07s linear;
+}
+
+.link-button:hover .link-button__line:nth-child(3) {
+    transform: translate(-8px, -5.5px) rotate(35deg);
+    width: 20%;
+    transition: transform .2s linear .1s, width .07s linear;
+}

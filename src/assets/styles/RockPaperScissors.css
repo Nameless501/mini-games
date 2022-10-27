@@ -1,0 +1,175 @@
+.rock-paper-scissors {
+    margin: 0;
+    padding: 0;
+}
+
+.rock-paper-scissors__frame {
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.rock-paper-scissors__round-counter {
+    margin: 0;
+    padding: 15px 0;
+    color: var(--color-purple);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.rock-paper-scissors__round-count {
+    margin: 0 0 0 5px;
+    padding: 0;
+    font-weight: 900;
+    color: var(--color-crimson);
+}
+
+.rock-paper-scissors__scores {
+    margin: 0;
+    padding: 15px 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.rock-paper-scissors__score {
+    margin: 0;
+    padding: 0;
+    color: var(--color-purple);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.rock-paper-scissors__score-count {
+    margin: 0 0 0 5px;
+    padding: 0;
+    color: var(--color-crimson);
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.rock-paper-scissors__bets {
+    margin: 0;
+    padding: 15px 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.rock-paper-scissors__bet {
+    margin: 0;
+    padding: auto 0;
+    width: 125px;
+    height: 125px;
+    position: relative;
+    border-radius: 50%;
+    border: 2px solid var(--color-purple);
+    text-align: center;
+    color: var(--color-purple);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 125px;
+    vertical-align: middle;
+}
+
+.rock-paper-scissors__controls {
+    margin: 0;
+    padding: 50px 0;
+    width: 100%;
+    border-radius: 0%;
+}
+
+.rock-paper-scissors__buttons-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.rock-paper-scissors__control-button {
+    margin: 0;
+    padding: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    background-color: var(--color-crimson);
+    border: 2px solid var(--color-white);
+    background-repeat: no-repeat;
+    background-size: 50px 50px;
+    background-position: center;
+    transition: background-size .2s linear;
+}
+
+.rock-paper-scissors__control-button_type_rock {
+    background-image: url('../images/rock-white.svg');
+}
+
+.rock-paper-scissors__control-button_type_paper {
+    background-image: url('../images/paper-white.svg');
+}
+
+.rock-paper-scissors__control-button_type_scissors {
+    background-image: url('../images/scissors-white.svg');
+}
+
+.rock-paper-scissors__control-button:hover {
+    background-size: 55px 55px;
+    background-color: var(--color-white);
+    border: 2px solid var(--color-purple);
+    cursor: pointer;
+    transition: background-size .2s linear;
+}
+
+.rock-paper-scissors__control-button_type_rock:hover {
+    background-image: url('../images/rock-purple.svg');
+}
+
+.rock-paper-scissors__control-button_type_paper:hover {
+    background-image: url('../images/paper-purple.svg');
+}
+
+.rock-paper-scissors__control-button_type_scissors:hover {
+    background-image: url('../images/scissors-purple.svg');
+}
+
+.rock-paper-scissors__bet-suggest {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    background-color: var(--color-crimson);
+    border: 2px solid var(--color-white);
+    background-repeat: no-repeat;
+    background-size: 90px 90px;
+    background-position: center;
+    transition: left .4s linear;
+}
+
+.rock-paper-scissors__user-bet {
+    left: -250%;
+    transition: left .3s linear;
+}
+
+.rock-paper-scissors__opponent-bet {
+    left: 250%;
+    transition: left .3s linear .3s;
+}
+
+.rock-paper-scissors__bet-suggest_active {
+    left: 0;
+}
