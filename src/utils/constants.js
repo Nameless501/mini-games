@@ -1,3 +1,7 @@
+import rock from '../assets/images/rock-white.svg';
+import paper from '../assets/images/paper-white.svg';
+import scissors from '../assets/images/scissors-white.svg';
+
 // --------- Snake game ---------
 
 export const DEFAULT_SNAKE = [
@@ -37,17 +41,17 @@ export const SNAKE_MOVE_DISTANCE = 10;
 export const RPS_CONFIG = [
     {
         name: 'rock',
-        img: '/rock-white.svg',
+        img: `${rock}`,
         beat: 'scissors',
     },
     {
         name: 'paper',
-        img: '/paper-white.svg',
+        img: `${paper}`,
         beat: 'rock',
     },
     {
         name: 'scissors',
-        img: '/scissors-white.svg',
+        img: `${scissors}`,
         beat: 'paper',
     }
 ];
