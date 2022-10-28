@@ -24,13 +24,6 @@
     }
 }
 
-@media screen and (max-width: 500px) {
-    .main__title{
-        font-size: 35px;
-        font-weight: 700;
-    }
-}
-
 .main__links-list {
     margin: 0;
     width: 40%;
@@ -46,20 +39,19 @@
 @media screen and (max-width: 1023px) {
     .main__links-list{
         padding: 25px 25px;
-        gap: 25px;
         width: 45%;
     }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 767px) {
     .main__links-list{
         width: 55%;
     }
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 500px) {
     .main__links-list{
-        width: 65%;
+        width: 75%;
     }
 }
 
@@ -75,52 +67,69 @@
     text-decoration: none;
 }
 
-.main__link-title {
+.main__link-button {
     margin: 0;
-    padding: 20px 30px;
+    padding: 0 35px;
+    height: 65px;
     color: var(--color-white);
     box-sizing: border-box;
+    border-radius: 65px;
+    text-align: center;
+    background-color: var(--color-crimson);
+    border: 0;
+    transition: padding .3s linear;
+}
+
+.main__link-title {
+    margin: 0;
+    padding: 0;
     font-size: 25px;
     line-height: 25px;
     font-weight: 700;
     transform: scale(1);
-    transition: transform .3s linear;
-    border-radius: 65px;
-    text-align: center;
-    background-color: var(--color-crimson);
+    transition: transform .3s linear, line-height .3s linear;
 }
 
-.main__link-title:hover {
+.main__link-button:hover {
     border: 2px solid var(--color-purple);
     background-color: var(--color-white);
+}
+
+.main__link-button:hover .main__link-title {
     color: var(--color-purple);
-    transform: scale(1.05);
-    transition: transform .3s linear;
+    transform: scale(1.15);
+    transition: transform .3s linear, line-height .3s linear;
 }
 
 @media screen and (max-width: 1023px) {
+    .main__link-button {
+        height: 60px;
+        border-radius: 60px;
+    }
+    
     .main__link-title {
-        padding: 20px 30px;
         font-size: 20px;
         line-height: 20px;
-        border-radius: 60px;
+    }
+    
+    .main__link-button:hover .main__link-title {
+        transform: scale(1.1);
     }
 }
 
 @media screen and (max-width: 767px) {
-    .main__link-title {
-        padding: 15px 25px;
-        font-size: 15px;
-        line-height: 15px;
-        border-radius: 45px;
+    .main__link-button {
+        padding: 0 25px;
+        height: 50px;
+        border-radius: 50px;
     }
-}
-
-@media screen and (max-width: 450px) {
+    
     .main__link-title {
-        padding: 12px 20px;
-        font-size: 12px;
-        line-height: 12px;
-        border-radius: 36px;
+        font-size: 20px;
+        line-height: 20px;
+    }
+    
+    .main__link-button:hover .main__link-title {
+        transform: scale(1.1);
     }
 }

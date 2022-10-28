@@ -60,7 +60,7 @@
 
 @media screen and (max-width: 1023px) {
     .controls-frame__frame {
-        margin: 10px 0 0;
+        margin: 15px 0 0;
         width: 690px;
         height: 480px;
     }
@@ -68,7 +68,7 @@
 
 @media screen and (max-width: 767px) {
     .controls-frame__frame {
-        margin: 5px 0 0;
+        margin: 15px 0 0;
         width: 500px;
         height: 350px;
     }
@@ -76,8 +76,8 @@
 
 @media screen and (max-width: 550px) {
     .controls-frame__frame {
-        margin: 5px 0 0;
+        margin: 15px 0 0;
         width: 320px;
-        height: 280px;
+        height: 380px;
     }
 }

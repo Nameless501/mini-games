@@ -10,38 +10,46 @@ function Main() {
             </h1>
             <ul className="main__links-list">
                 <li className="main__links-list-item">
-                    <Link to="/snake" className="main__link">
+                    <button className="main__link-button">
                         <p className="main__link-title">
-                            Snake
+                            Placeholder
                         </p>
+                    </button>
+                </li>
+                <li className="main__links-list-item">
+                    <Link to="/snake" className="main__link">
+                        <button className="main__link-button">
+                            <p className="main__link-title">
+                                Snake
+                            </p>
+                        </button>
                     </Link>
                 </li>
                 <li className="main__links-list-item">
                     <Link to="/rock-paper-scissors" className="main__link">
-                        <p className="main__link-title">
-                            Rock, paper, scissors
-                        </p>
+                        <button className="main__link-button">
+                            <p className="main__link-title">
+                                Rock, paper, scissors
+                            </p>
+                        </button>
                     </Link>
                 </li>
                 <li className="main__links-list-item">
                     <Link to="/" className="main__link">
-                        <p className="main__link-title">
-                            Placeholder
-                        </p>
+                        <button className="main__link-button">
+                            <p className="main__link-title">
+                                Placeholder
+                            </p>
+                        </button>
                     </Link>
                 </li>
                 <li className="main__links-list-item">
                     <Link to="/" className="main__link">
-                        <p className="main__link-title">
-                            Placeholder
-                        </p>
-                    </Link>
-                </li>
-                <li className="main__links-list-item">
-                    <Link to="/" className="main__link">
-                        <p className="main__link-title">
-                            Placeholder
-                        </p>
+                        <button className="main__link-button">
+                            <p className="main__link-title">
+                                Placeholder
+                            </p>
+                        </button>
                     </Link>
                 </li>
             </ul>

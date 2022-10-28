@@ -38,7 +38,7 @@
 
 @media screen and (max-width: 767px) {
     .rock-paper-scissors__round-counter {
-        padding: 5px 0;
+        padding: 10px 0;
         font-size: 25px;
     }
 
@@ -48,15 +48,6 @@
     }
 }
 
-@media screen and (max-width: 550px) {
-    .rock-paper-scissors__round-counter {
-        font-size: 20px;
-    }
-
-    .rock-paper-scissors__round-count {
-        font-size: 20px;
-    }
-}
 
 .rock-paper-scissors__scores {
     margin: 0;
@@ -125,7 +116,7 @@
 
 @media screen and (max-width: 767px) {
     .rock-paper-scissors__bets {
-        padding: 10px 0;
+        padding: 15px 0;
     }
 
     .rock-paper-scissors__bet {
@@ -180,49 +171,51 @@
     background-image: url('../images/scissors-white.svg');
 }
 
-.rock-paper-scissors__control-button:hover {
-    background-size: 55px 55px;
-    background-color: var(--color-white);
-    border: 2px solid var(--color-purple);
-    cursor: pointer;
-    transition: background-size .2s linear;
-}
-
-.rock-paper-scissors__control-button_type_rock:hover {
-    background-image: url('../images/rock-purple.svg');
-}
-
-.rock-paper-scissors__control-button_type_paper:hover {
-    background-image: url('../images/paper-purple.svg');
-}
-
-.rock-paper-scissors__control-button_type_scissors:hover {
-    background-image: url('../images/scissors-purple.svg');
+@media screen and (min-width: 768px) {
+    .rock-paper-scissors__control-button:hover {
+        background-size: 55px 55px;
+        background-color: var(--color-white);
+        border: 2px solid var(--color-purple);
+        cursor: pointer;
+        transition: background-size .2s linear;
+    }
+    
+    .rock-paper-scissors__control-button_type_rock:hover {
+        background-image: url('../images/rock-purple.svg');
+    }
+    
+    .rock-paper-scissors__control-button_type_paper:hover {
+        background-image: url('../images/paper-purple.svg');
+    }
+    
+    .rock-paper-scissors__control-button_type_scissors:hover {
+        background-image: url('../images/scissors-purple.svg');
+    }
 }
 
 @media screen and (max-width: 767px) {
     .rock-paper-scissors__controls {
         padding: 25px 0;
     }
+
     .rock-paper-scissors__control-button {
         width: 65px;
         height: 65px;
         background-size: 40px 40px;
     }
-    .rock-paper-scissors__control-button:hover {
-        background-size: 45px 45px;
-    }
 }
 
 @media screen and (max-width: 550px) {
     .rock-paper-scissors__controls {
-        padding: 10px 0;
+        padding: 25px 0;
     }
+
     .rock-paper-scissors__control-button {
         width: 55px;
         height: 55px;
         background-size: 35px 35px;
     }
+
     .rock-paper-scissors__control-button:hover {
         background-size: 35px 35px;
     }

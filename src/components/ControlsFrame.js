@@ -1,10 +1,21 @@
-import React from 'react';
-import StartPopup from './StartPopup';
+import { useState } from 'react';
+import StartPopup from './StartPopup.js';
+import InfoPopup from './InfoPopup.js';
 import LinkButton from './LinkButton.js';
 import InfoButton from './InfoButton.js';
 import '../assets/styles/ControlsFrame.css';
 
 function ControlsFrame({ inGame, setStart, score, children }) {
+    const [infoIsOpen, setInfoState] = useState(false);
+
+    function handleInfoOpen() {
+        if(infoIsOpen) {
+            setInfoState(false);
+        } else {
+            setInfoState(true);
+        }
+    }
+
     return (
         <div className="controls-frame">
             <nav className="controls-frame__navigation">
@@ -13,7 +24,9 @@ function ControlsFrame({ inGame, setStart, score, children }) {
                         <LinkButton />
                     </li>
                     <li>
-                        <InfoButton />
+                        <InfoButton 
+                            handleClick={handleInfoOpen}
+                        />
                     </li>
                 </ul>
             </nav>
@@ -23,6 +36,9 @@ function ControlsFrame({ inGame, setStart, score, children }) {
                     inGame={inGame}
                     setStart={setStart}
                     score={score}
+                />
+                <InfoPopup 
+                    isOpen={infoIsOpen}
                 />
             </div>
         </div>
