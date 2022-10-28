@@ -7,7 +7,12 @@ import { SNAKE_MOVE_TIME, SNAKE_POSSIBLE_KEYS, SNAKE_POSSIBLE_DIRECTION, SNAKE_K
 import { getBlockSize, getFrameSize } from '../utils/utils.js';
 
 function Snake() {
-    const [snakePosition, setSnakePosition] = useState(() => getInitialSnakePosition());
+    const [snakePosition, setSnakePosition] = useState(() => {
+        const block = getBlockSize();
+        const frame = getFrameSize();
+
+        return getInitialSnakePosition(block, frame);
+    });
     const [previousTalePosition, setPreviousTalePosition] = useState({});
     const [foodCollision, setFoodCollision] = useState(false);
     const [selfCollision, setSelfCollision] = useState(false);
@@ -19,9 +24,9 @@ function Snake() {
 
 // set initial sizes and position
 
-    function calculateSnakePosition(blockSize, frameSize) {
-        const headX = (frameSize.x / 2) - blockSize;
-        const headY = (frameSize.y / 2) - blockSize;
+    function getInitialSnakePosition(blockSize, frameSize) {
+        const headX = Math.floor((frameSize.x / blockSize) / 2) * blockSize;
+        const headY = Math.floor((frameSize.y / blockSize) / 2) * blockSize;
 
         const initialPosition = [
             {x: headX, y: headY},
@@ -30,13 +35,6 @@ function Snake() {
         ]
 
         return initialPosition;
-    }
-
-    function getInitialSnakePosition() {
-        const block = getBlockSize();
-        const frame = getFrameSize();
-
-        return calculateSnakePosition(block, frame);
     }
 
     useEffect(() => {
@@ -50,8 +48,14 @@ function Snake() {
 // reset all to default
 
     function setAllToDefault() {
+        const block = getBlockSize();
+        const frame = getFrameSize();
+        const initialSnakePosition = getInitialSnakePosition(block, frame);
+
+        blockSize.current = block;
+        frameSize.current = frame;
         currentDirection.current = SNAKE_DEFAULT_DIRECTION;
-        setSnakePosition(() => getInitialSnakePosition());
+        setSnakePosition(initialSnakePosition);
         setPreviousTalePosition({});
         setSelfCollision(false);
         setScore(0);
@@ -193,13 +197,10 @@ function Snake() {
             >
                 <SnakeBlocks 
                     snakePosition={snakePosition} 
-                    blockSize={blockSize}
                 />
                 <SnakeFood
                     snakePosition={snakePosition}
                     setCollisionState={setFoodCollision}
-                    frameSize={frameSize}
-                    blockSize={blockSize}
                 />
             </ControlsFrame>
         </>

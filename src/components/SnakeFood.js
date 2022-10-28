@@ -3,7 +3,7 @@ import '../assets/styles/SnakeFood.css';
 import { getRandomNumber, getBlockSize, getFrameSize } from '../utils/utils.js';
 
 function SnakeFood({ snakePosition, setCollisionState }) {
-    const [foodPosition, setFoodPosition] = useState();
+    const [foodPosition, setFoodPosition] = useState(() => getRandomPosition());
 
 // handle random food position
 
@@ -19,16 +19,13 @@ function SnakeFood({ snakePosition, setCollisionState }) {
         if(collision) {
             getRandomPosition();
         } else {
-            setFoodPosition({
+            console.log(x, y);
+            return ({
                 top: y,
                 left: x,
             })
         }
     }
-
-    useState(() => {
-        getRandomPosition();
-    }, []);
 
 // handle food collision
 
@@ -37,7 +34,7 @@ function SnakeFood({ snakePosition, setCollisionState }) {
         const collision = snakeHead.x === foodPosition.left && snakeHead.y === foodPosition.top;
 
         if(collision) {
-            getRandomPosition();
+            setFoodPosition(() => getRandomPosition());
             setCollisionState(true);
         }
     }
