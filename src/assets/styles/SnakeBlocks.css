@@ -12,3 +12,32 @@
 .snake-block:first-child {
     border: 3px solid var(--color-crimson);
 }
+
+@media screen and (max-width: 1023px) {
+    .snake-block {
+        width: 30px;
+        height: 30px;
+    }
+
+    .snake-block:first-child {
+        border: 2px solid var(--color-crimson);
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .snake-block {
+        width: 25px;
+        height: 25px;
+    }
+
+    .snake-block:first-child {
+        border: 1.5px solid var(--color-crimson);
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .snake-block {
+        width: 20px;
+        height: 20px;
+    }
+}

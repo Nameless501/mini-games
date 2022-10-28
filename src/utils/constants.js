@@ -2,13 +2,16 @@ import rock from '../assets/images/rock-white.svg';
 import paper from '../assets/images/paper-white.svg';
 import scissors from '../assets/images/scissors-white.svg';
 
-// --------- Snake game ---------
+// --------- general ---------
 
-export const DEFAULT_SNAKE = [
-    {x: 360, y: 280},
-    {x: 360, y: 320},
-    {x: 360, y: 360},
-]
+export const FRAME_SIZES = {
+    1280: {x: 800, y: 600},
+    1023: {x: 690, y: 480},
+    767: {x: 500, y: 350},
+    550: {x: 320, y: 280},
+}
+
+// --------- Snake game ---------
 
 export const SNAKE_POSSIBLE_DIRECTION = {
     up: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight'],

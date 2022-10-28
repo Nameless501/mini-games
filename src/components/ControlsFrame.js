@@ -1,22 +1,10 @@
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import StartPopup from './StartPopup';
 import LinkButton from './LinkButton.js';
 import InfoButton from './InfoButton.js';
 import '../assets/styles/ControlsFrame.css';
 
-function ControlsFrame({ inGame, setStart, score, setFrameSize, children }) {
-    const frame = useRef();
-
-    useEffect(() => {
-        const frameHeight = frame.current.clientHeight;
-        const frameWidth = frame.current.clientWidth;
-
-        setFrameSize({
-            x: frameWidth,
-            y: frameHeight,
-        })
-    }, []);
-
+function ControlsFrame({ inGame, setStart, score, children }) {
     return (
         <div className="controls-frame">
             <nav className="controls-frame__navigation">
@@ -29,7 +17,7 @@ function ControlsFrame({ inGame, setStart, score, setFrameSize, children }) {
                     </li>
                 </ul>
             </nav>
-            <div className="controls-frame__frame" ref={frame} >
+            <div className="controls-frame__frame" >
                 {children}
                 <StartPopup 
                     inGame={inGame}

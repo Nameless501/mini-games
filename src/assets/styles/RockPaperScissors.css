@@ -15,6 +15,12 @@
     align-items: center;
 }
 
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__frame {
+        padding: 10px;
+    }
+}
+
 .rock-paper-scissors__round-counter {
     margin: 0;
     padding: 15px 0;
@@ -28,6 +34,28 @@
     padding: 0;
     font-weight: 900;
     color: var(--color-crimson);
+}
+
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__round-counter {
+        padding: 5px 0;
+        font-size: 25px;
+    }
+
+    .rock-paper-scissors__round-count {
+        font-size: 25px;
+        font-weight: 700;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .rock-paper-scissors__round-counter {
+        font-size: 20px;
+    }
+
+    .rock-paper-scissors__round-count {
+        font-size: 20px;
+    }
 }
 
 .rock-paper-scissors__scores {
@@ -55,6 +83,21 @@
     font-weight: 900;
 }
 
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__scores {
+        padding: 10px 0;
+    }
+
+    .rock-paper-scissors__score {
+        font-size: 15px;
+    }
+
+    .rock-paper-scissors__score-count {
+        font-size: 15px;
+        font-weight: 700;
+    }
+}
+
 .rock-paper-scissors__bets {
     margin: 0;
     padding: 15px 0;
@@ -78,6 +121,20 @@
     font-weight: 700;
     line-height: 125px;
     vertical-align: middle;
+}
+
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__bets {
+        padding: 10px 0;
+    }
+
+    .rock-paper-scissors__bet {
+        width: 90px;
+        height: 90px;
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 90px;
+    }
 }
 
 .rock-paper-scissors__controls {
@@ -143,6 +200,34 @@
     background-image: url('../images/scissors-purple.svg');
 }
 
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__controls {
+        padding: 25px 0;
+    }
+    .rock-paper-scissors__control-button {
+        width: 65px;
+        height: 65px;
+        background-size: 40px 40px;
+    }
+    .rock-paper-scissors__control-button:hover {
+        background-size: 45px 45px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .rock-paper-scissors__controls {
+        padding: 10px 0;
+    }
+    .rock-paper-scissors__control-button {
+        width: 55px;
+        height: 55px;
+        background-size: 35px 35px;
+    }
+    .rock-paper-scissors__control-button:hover {
+        background-size: 35px 35px;
+    }
+}
+
 .rock-paper-scissors__bet-suggest {
     margin: 0;
     padding: 0;
@@ -172,4 +257,10 @@
 
 .rock-paper-scissors__bet-suggest_active {
     left: 0;
+}
+
+@media screen and (max-width: 767px) {
+    .rock-paper-scissors__bet-suggest {
+        background-size: 65px 65px;
+    }
 }

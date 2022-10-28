@@ -3,24 +3,55 @@ import '../assets/styles/Snake.css';
 import SnakeBlocks from './SnakeBlocks.js';
 import SnakeFood from './SnakeFood.js';
 import ControlsFrame from './ControlsFrame.js';
-import { DEFAULT_SNAKE, SNAKE_MOVE_TIME, SNAKE_POSSIBLE_KEYS, SNAKE_POSSIBLE_DIRECTION, SNAKE_KEY_MOVES, SNAKE_DEFAULT_DIRECTION } from '../utils/constants.js';
-import { getRandomNumber } from '../utils/utils.js';
+import { SNAKE_MOVE_TIME, SNAKE_POSSIBLE_KEYS, SNAKE_POSSIBLE_DIRECTION, SNAKE_KEY_MOVES, SNAKE_DEFAULT_DIRECTION } from '../utils/constants.js';
+import { getBlockSize, getFrameSize } from '../utils/utils.js';
 
 function Snake() {
-    const [snakePosition, setSnakePosition] = useState(DEFAULT_SNAKE);
-    const [frameSize, setFrameSize] = useState({x: 800, y: 600})
+    const [snakePosition, setSnakePosition] = useState(() => getInitialSnakePosition());
     const [previousTalePosition, setPreviousTalePosition] = useState({});
     const [foodCollision, setFoodCollision] = useState(false);
     const [selfCollision, setSelfCollision] = useState(false);
     const [score, setScore] = useState(0)
     const [inGame, setGameState] = useState(false);
     const currentDirection = useRef(SNAKE_DEFAULT_DIRECTION);
+    const blockSize = useRef();
+    const frameSize = useRef();
+
+// set initial sizes and position
+
+    function calculateSnakePosition(blockSize, frameSize) {
+        const headX = (frameSize.x / 2) - blockSize;
+        const headY = (frameSize.y / 2) - blockSize;
+
+        const initialPosition = [
+            {x: headX, y: headY},
+            {x: headX, y: (headY + blockSize)},
+            {x: headX, y: (headY + blockSize * 2)},
+        ]
+
+        return initialPosition;
+    }
+
+    function getInitialSnakePosition() {
+        const block = getBlockSize();
+        const frame = getFrameSize();
+
+        return calculateSnakePosition(block, frame);
+    }
+
+    useEffect(() => {
+        const block = getBlockSize();
+        const frame = getFrameSize();
+
+        blockSize.current = block;
+        frameSize.current = frame;
+    }, []);
 
 // reset all to default
 
     function setAllToDefault() {
         currentDirection.current = SNAKE_DEFAULT_DIRECTION;
-        setSnakePosition(DEFAULT_SNAKE);
+        setSnakePosition(() => getInitialSnakePosition());
         setPreviousTalePosition({});
         setSelfCollision(false);
         setScore(0);
@@ -34,16 +65,16 @@ function Snake() {
             x: snakePosition[0]['x'],
             y: snakePosition[0]['y'],
         };
-    
-        const overflowTopOrLeft = (newHead[axis] + 40 * multiplier) < 0;
-        const overflowBottomOrRight = (newHead[axis] + 40 * multiplier) > (frameSize[axis] - 40);
+
+        const overflowTopOrLeft = (newHead[axis] + blockSize.current * multiplier) < 0;
+        const overflowBottomOrRight = (newHead[axis] + blockSize.current * multiplier) > (frameSize.current[axis] - blockSize.current);
 
         if(overflowTopOrLeft) {
-            newHead[axis] = (frameSize[axis] - 40);
+            newHead[axis] = (frameSize.current[axis] - blockSize.current);
         } else if (overflowBottomOrRight) {
             newHead[axis] = 0;
         } else {
-            newHead[axis] += 40 * multiplier;
+            newHead[axis] += blockSize.current * multiplier;
         }
     
         const newPosition = [newHead];
@@ -74,21 +105,31 @@ function Snake() {
 
 // keyboard event handlers
 
-    useEffect(() => {
-        function handleKeydown(evt) {
-            const isPossibleKey = SNAKE_POSSIBLE_KEYS.some(key => key === evt.code);
+    /* function handleDirectionChange(direction) {
+        const isPossibleDirection = SNAKE_POSSIBLE_DIRECTION[currentDirection.current[2]].some(key => {
+            return key === evt.code;
+        });
 
-            if (isPossibleKey) {
-                const isPossibleDirection = SNAKE_POSSIBLE_DIRECTION[currentDirection.current[2]].some(key => {
-                    return key === evt.code;
-                });
+        if(isPossibleDirection) {
+            currentDirection.current = [...SNAKE_KEY_MOVES[evt.code]];
+        }
+    } */
 
-                if(isPossibleDirection) {
-                    currentDirection.current = [...SNAKE_KEY_MOVES[evt.code]];
-                }
+    function handleKeydown(evt) {
+        const isPossibleKey = SNAKE_POSSIBLE_KEYS.some(key => key === evt.code);
+    
+        if (isPossibleKey) {
+            const isPossibleDirection = SNAKE_POSSIBLE_DIRECTION[currentDirection.current[2]].some(key => {
+                return key === evt.code;
+            });
+    
+            if(isPossibleDirection) {
+                currentDirection.current = [...SNAKE_KEY_MOVES[evt.code]];
             }
         }
+    }
 
+    useEffect(() => {
         window.addEventListener('keydown', handleKeydown);
 
         return(() => {
@@ -149,15 +190,16 @@ function Snake() {
                 inGame={inGame}
                 setStart={setAllToDefault}
                 score={score}
-                setFrameSize={setFrameSize}
             >
                 <SnakeBlocks 
                     snakePosition={snakePosition} 
+                    blockSize={blockSize}
                 />
                 <SnakeFood
                     snakePosition={snakePosition}
                     setCollisionState={setFoodCollision}
                     frameSize={frameSize}
+                    blockSize={blockSize}
                 />
             </ControlsFrame>
         </>

@@ -20,7 +20,9 @@ function StartPopup({ inGame, setStart, score }) {
                 className="start-popup__button" 
                 onClick={handleClick}
             >
-                Start
+                <p className="start-popup__button-text">
+                    Start
+                </p>
             </button>
         </div>
     );

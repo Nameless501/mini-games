@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import '../assets/styles/SnakeFood.css';
-import { getRandomNumber } from '../utils/utils.js';
+import { getRandomNumber, getBlockSize, getFrameSize } from '../utils/utils.js';
 
-function SnakeFood({ snakePosition, setCollisionState, frameSize }) {
+function SnakeFood({ snakePosition, setCollisionState }) {
     const [foodPosition, setFoodPosition] = useState();
 
 // handle random food position
 
     function getRandomPosition() {
-        const x = getRandomNumber(0, (frameSize.x / 40)) * 40;
-        const y = getRandomNumber(0, (frameSize.y / 40)) * 40;
+        const foodSize = getBlockSize();
+        const frameSize = getFrameSize();
+
+        const x = getRandomNumber(0, (frameSize.x / foodSize)) * foodSize;
+        const y = getRandomNumber(0, (frameSize.y / foodSize)) * foodSize;
 
         const collision = snakePosition.some(item => item.x === x && item.y === y);
 
