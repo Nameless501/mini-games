@@ -19,7 +19,6 @@ function SnakeFood({ snakePosition, setCollisionState }) {
         if(collision) {
             getRandomPosition();
         } else {
-            console.log(x, y);
             return ({
                 top: y,
                 left: x,

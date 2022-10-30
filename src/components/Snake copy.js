@@ -109,21 +109,17 @@ function Snake() {
 
 // keyboard event handlers
 
-    function handleDirectionChange(direction) {
-        const isPossibleDirection = SNAKE_POSSIBLE_DIRECTION[currentDirection.current[2]].some(item => {
-            return item === direction;
-        });
-
-        if(isPossibleDirection) {
-            currentDirection.current = [...SNAKE_KEY_MOVES[direction]];
-        }
-    }
-
     function handleKeydown(evt) {
         const isPossibleKey = SNAKE_POSSIBLE_KEYS.some(key => key === evt.code);
     
         if (isPossibleKey) {
-            handleDirectionChange(evt.code);
+            const isPossibleDirection = SNAKE_POSSIBLE_DIRECTION[currentDirection.current[2]].some(key => {
+                return key === evt.code;
+            });
+    
+            if(isPossibleDirection) {
+                currentDirection.current = [...SNAKE_KEY_MOVES[evt.code]];
+            }
         }
     }
 
@@ -188,8 +184,6 @@ function Snake() {
                 inGame={inGame}
                 setStart={setAllToDefault}
                 score={score}
-                showButtons={true}
-                handleClick={handleDirectionChange}
             >
                 <SnakeBlocks 
                     snakePosition={snakePosition} 

@@ -3,9 +3,10 @@ import StartPopup from './StartPopup.js';
 import InfoPopup from './InfoPopup.js';
 import LinkButton from './LinkButton.js';
 import InfoButton from './InfoButton.js';
+import ControlButton from './ControlButton.js';
 import '../assets/styles/ControlsFrame.css';
 
-function ControlsFrame({ inGame, setStart, score, children }) {
+function ControlsFrame({ inGame, setStart, score, showButtons=false, handleClick, children }) {
     const [infoIsOpen, setInfoState] = useState(false);
 
     function handleInfoOpen() {
@@ -26,6 +27,7 @@ function ControlsFrame({ inGame, setStart, score, children }) {
                     <li>
                         <InfoButton 
                             handleClick={handleInfoOpen}
+                            isActive={infoIsOpen}
                         />
                     </li>
                 </ul>
@@ -41,6 +43,38 @@ function ControlsFrame({ inGame, setStart, score, children }) {
                     isOpen={infoIsOpen}
                 />
             </div>
+            {showButtons && <>
+                <div className="control-buttons" >
+                    <nav className="controls-buttons__navigation">
+                        <ul className="controls-buttons__navigation-list" >
+                            <li>
+                                <ControlButton 
+                                    direction='up' 
+                                    handleClick={handleClick}
+                                />
+                            </li>
+                            <li>
+                                <ControlButton 
+                                    direction='down' 
+                                    handleClick={handleClick}
+                                />
+                            </li>
+                            <li>
+                                <ControlButton 
+                                    direction='left' 
+                                    handleClick={handleClick}
+                                />
+                            </li>
+                            <li>
+                                <ControlButton 
+                                    direction='right' 
+                                    handleClick={handleClick}
+                                />
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </>}
         </div>
     );
 }

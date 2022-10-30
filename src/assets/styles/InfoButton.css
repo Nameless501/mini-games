@@ -25,6 +25,10 @@
     transition: transform .2s linear;
 }
 
+.info-button__icon_active {
+    background-image: url('../images/close-white.svg');
+}
+
 @media screen and (min-width: 768px) {
     .info-button:hover {
         background-color: var(--color-white);
@@ -37,6 +41,11 @@
         background-image: url('../images/question-purple.svg');
         transform: scale(1.15);
         transition: transform .2s linear;
+    }
+
+    .info-button:hover .info-button__icon_active {
+        background-image: url('../images/close-purple.svg');
+        fill: black;
     }
 }
 

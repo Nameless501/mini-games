@@ -81,3 +81,40 @@
         height: 380px;
     }
 }
+
+.controls-buttons {
+    margin: 0 auto;
+    padding: 0;
+    max-width: 320px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.controls-buttons__navigation {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.controls-buttons__navigation-list {
+    margin: 0;
+    padding: 20px 0;
+    width: 320px;
+    box-sizing: border-box;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media screen and (min-width: 550px) {
+    .controls-buttons {
+        display: none;
+    }
+
+    .controls-buttons__navigation-list {
+        display: none;
+    }
+}

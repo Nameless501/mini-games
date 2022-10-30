@@ -14,10 +14,10 @@ export const FRAME_SIZES = {
 // --------- Snake game ---------
 
 export const SNAKE_POSSIBLE_DIRECTION = {
-    up: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight'],
-    right: ['KeyW', 'KeyS', 'ArrowUp', 'ArrowDown'],
-    down: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight'],
-    left: ['KeyW', 'KeyS', 'ArrowUp', 'ArrowDown'],
+    up: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight', 'left', 'right'],
+    right: ['KeyW', 'KeyS', 'ArrowUp', 'ArrowDown', 'up', 'down'],
+    down: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight', 'left', 'right'],
+    left: ['KeyW', 'KeyS', 'ArrowUp', 'ArrowDown', 'up', 'down'],
 }
 
 export const SNAKE_KEY_MOVES = {
@@ -29,6 +29,10 @@ export const SNAKE_KEY_MOVES = {
     ArrowLeft: ['x', -1,  'left'],
     KeyD: ['x', 1, 'right'],
     ArrowRight: ['x', 1, 'right'],
+    up: ['y', -1, 'up'],
+    down: ['y', 1, 'down'],
+    left: ['x', -1,  'left'],
+    right: ['x', 1, 'right'],
 }
 
 export const SNAKE_DEFAULT_DIRECTION = ['y', -1, 'up'];
