@@ -11,6 +11,10 @@ export const FRAME_SIZES = {
     550: {x: 320, y: 380},
 }
 
+export const COLOR_CRIMSON = 'rgb(227, 72, 97)';
+
+export const COLOR_PURPLE = 'rgb(26, 10, 77)';
+
 // --------- Snake game ---------
 
 export const SNAKE_POSSIBLE_DIRECTION = {
@@ -62,3 +66,23 @@ export const RPS_CONFIG = [
         beat: 'paper',
     }
 ];
+
+// --------- Breakout ---------
+
+export const PADDLE_WIDTH = 100;
+
+export const PADDLE_HEIGHT = 15;
+
+export const BALL_RADIUS = 15;
+
+export const BRICK_PADDING = 15;
+
+export const BRICK_HEIGHT = 30;
+
+export const COLUMNS = 6;
+
+export const ROWS = 4;
+
+export const FONT_SIZE = 20;
+
+export const BALL_VELOCITY = 4;

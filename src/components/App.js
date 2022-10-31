@@ -4,6 +4,7 @@ import Header from './Header.js';
 import RockPaperScissors from './RockPaperScissors';
 import Snake from './Snake.js';
 import Main from './Main.js';
+import Breakout from './Breakout';
 
 
 function App() {
@@ -19,6 +20,9 @@ function App() {
         </Route>
         <Route path='/rock-paper-scissors' >
           <RockPaperScissors />
+        </Route>
+        <Route path='/breakout' >
+          <Breakout />
         </Route>
       </Switch>
     </div>
