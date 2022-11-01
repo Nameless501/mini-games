@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect } from 'react';
 import '../assets/styles/Breakout.css';
 import ControlsFrame from './ControlsFrame.js';
 import { COLOR_CRIMSON, COLOR_PURPLE, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
@@ -126,16 +126,19 @@ function Breakout() {
 
 // --------- lose and reset handlers ---------
 
-    function resetAll() {
+
+
+    function resetAllStates() {
         inGame.current = false;
 
         directionX.current = BALL_VELOCITY;
         directionY.current = BALL_VELOCITY;
-        bricks.current = createBricks();
 
         paddleX.current = (canvasRef.current.width / 2) - (PADDLE_WIDTH / 2);
         paddleY.current = canvasRef.current.height - PADDLE_HEIGHT;
+    }
 
+    function resetBall() {
         ballX.current = paddleX.current + PADDLE_WIDTH / 2;
         ballY.current = paddleY.current - BALL_RADIUS;
     }
@@ -143,8 +146,10 @@ function Breakout() {
     function handleGameOver() {
         setStartGame(false);
 
-        resetAll();
+        resetAllStates();
+        resetBall();
 
+        bricks.current = createBricks();
         scoreCount.current = 0;
         livesCount.current = 3;
     }
@@ -187,12 +192,13 @@ function Breakout() {
     function handleBottomOverflow() {
         cancelAnimationFrame(animation.current);
 
-        resetAll();
+        resetAllStates();
 
         setTimeout(() => {
+            resetBall()
             clearAll();
             drawAll();
-        }, 150);
+        }, 100);
 
         if(--livesCount.current < 1) {
             handleGameOver();
@@ -231,17 +237,15 @@ function Breakout() {
     }
 
     function handleBallMove() {
+        if(inGame.current === true) {
+            animation.current = requestAnimationFrame(handleBallMove);
+        }
+
         checkBallDirection();
         makeBallMove();
 
         clearAll();
         drawAll();
-
-        if(inGame.current === true) {
-            animation.current = requestAnimationFrame(handleBallMove);
-        } else {
-            requestAnimationFrame(resetAll);
-        }
     }
 
 // --------- useLayoutEffect ---------
@@ -255,7 +259,11 @@ function Breakout() {
         canvasContext.current = canvasRef.current.getContext('2d');
         brickWidth.current = (canvasRef.current.width - BRICK_PADDING) / COLUMNS;
 
-        resetAll();
+        bricks.current = createBricks();
+
+        resetAllStates();
+        resetBall();
+
         drawAll();
 
         window.addEventListener('mousemove', handleMousemove);
