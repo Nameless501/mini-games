@@ -188,12 +188,13 @@ function Breakout() {
         cancelAnimationFrame(animation.current);
 
         resetAll();
-        clearAll();
-        drawAll();
 
-        if((livesCount.current - 1) > 0) {
-            livesCount.current--;
-        } else {
+        setTimeout(() => {
+            clearAll();
+            drawAll();
+        }, 150);
+
+        if(--livesCount.current < 1) {
             handleGameOver();
         }
     }
@@ -258,11 +259,13 @@ function Breakout() {
         drawAll();
 
         window.addEventListener('mousemove', handleMousemove);
+        window.addEventListener('mousedown', handleMousemove);
         canvasRef.current.addEventListener('click', handleClick);
         canvasRef.current.addEventListener('click', handleBallMove);
 
         return (() => {
             window.removeEventListener('mousemove', handleMousemove);
+            window.removeEventListener('mousedown', handleMousemove);
             canvasRef.current.removeEventListener('click', handleClick);
             canvasRef.current.removeEventListener('click', handleBallMove);
         })
