@@ -37,10 +37,10 @@ function Main() {
                     </Link>
                 </li>
                 <li className="main__links-list-item">
-                    <Link to="/" className="main__link">
+                    <Link to="/basketball" className="main__link">
                         <button className="main__link-button">
                             <p className="main__link-title">
-                                Placeholder
+                                Basketball
                             </p>
                         </button>
                     </Link>

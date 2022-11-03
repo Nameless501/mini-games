@@ -6,7 +6,7 @@ import InfoButton from './InfoButton.js';
 import ControlButton from './ControlButton.js';
 import '../assets/styles/ControlsFrame.css';
 
-function ControlsFrame({ inGame, setStart, score, showButtons=false, handleClick, children }) {
+function ControlsFrame({ inGame, setStart, score, showButtons=false, buttonsList=null, handleClick, handlePause=null, children }) {
     const [infoIsOpen, setInfoState] = useState(false);
 
     function handleInfoOpen() {
@@ -14,6 +14,10 @@ function ControlsFrame({ inGame, setStart, score, showButtons=false, handleClick
             setInfoState(false);
         } else {
             setInfoState(true);
+        }
+
+        if(handlePause) {
+            handlePause();
         }
     }
 
@@ -47,30 +51,16 @@ function ControlsFrame({ inGame, setStart, score, showButtons=false, handleClick
                 <div className="control-buttons" >
                     <nav className="controls-buttons__navigation">
                         <ul className="controls-buttons__navigation-list" >
-                            <li>
-                                <ControlButton 
-                                    direction='up' 
-                                    handleClick={handleClick}
-                                />
-                            </li>
-                            <li>
-                                <ControlButton 
-                                    direction='down' 
-                                    handleClick={handleClick}
-                                />
-                            </li>
-                            <li>
-                                <ControlButton 
-                                    direction='left' 
-                                    handleClick={handleClick}
-                                />
-                            </li>
-                            <li>
-                                <ControlButton 
-                                    direction='right' 
-                                    handleClick={handleClick}
-                                />
-                            </li>
+                            {buttonsList.map((item, ind) => {
+                                return (
+                                    <li key={ind} >
+                                        <ControlButton 
+                                            direction={item} 
+                                            handleClick={handleClick}
+                                        />
+                                    </li>
+                                )
+                            })}
                         </ul>
                     </nav>
                 </div>

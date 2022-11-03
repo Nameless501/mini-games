@@ -1,7 +1,7 @@
 import { useState, useRef, useLayoutEffect } from 'react';
-import '../assets/styles/Breakout.css';
+import '../assets/styles/Canvas.css'
 import ControlsFrame from './ControlsFrame.js';
-import { COLOR_CRIMSON, COLOR_PURPLE, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
+import { COLOR_LIGHT, COLOR_DARK, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
 import { getFrameSize } from '../utils/utils.js';
 
 function Breakout() {
@@ -25,7 +25,7 @@ function Breakout() {
 
     function drawScoreCounter() {
         canvasContext.current.font = `${FONT_SIZE}px Segoe UI`;
-        canvasContext.current.fillStyle = COLOR_CRIMSON;
+        canvasContext.current.fillStyle = COLOR_DARK;
         canvasContext.current.fillText(`Score: ${scoreCount.current}`, 10, FONT_SIZE);
     }
 
@@ -33,12 +33,12 @@ function Breakout() {
         const right = canvasRef.current.width - 75;
 
         canvasContext.current.font = `${FONT_SIZE}px Segoe UI`;
-        canvasContext.current.fillStyle = COLOR_CRIMSON;
+        canvasContext.current.fillStyle = COLOR_DARK;
         canvasContext.current.fillText(`Lives: ${livesCount.current}`, right, FONT_SIZE);
     }
 
     function drawPaddle() {
-        canvasContext.current.fillStyle = COLOR_PURPLE;
+        canvasContext.current.fillStyle = COLOR_LIGHT;
         canvasContext.current.fillRect(paddleX.current, paddleY.current, PADDLE_WIDTH, PADDLE_HEIGHT);
     }
 
@@ -60,7 +60,7 @@ function Breakout() {
     function drawBricks() {
         bricks.current.forEach(item => {
             if(item.on === true) {
-                canvasContext.current.fillStyle = COLOR_PURPLE;
+                canvasContext.current.fillStyle = COLOR_LIGHT;
                 canvasContext.current.fillRect(item.x, item.y, brickWidth.current - BRICK_PADDING, BRICK_HEIGHT);
             }
         })
@@ -68,7 +68,7 @@ function Breakout() {
 
     function drawBall() {
         canvasContext.current.beginPath();
-        canvasContext.current.fillStyle = COLOR_CRIMSON;
+        canvasContext.current.fillStyle = COLOR_DARK;
         canvasContext.current.arc(ballX.current, ballY.current, BALL_RADIUS, 0, Math.PI * 2, false);
         canvasContext.current.fill();
         canvasContext.current.closePath();
@@ -124,9 +124,34 @@ function Breakout() {
         inGame.current = true;
     }
 
+    function handleControlButton(direction) {
+        if(direction === "left") {
+            paddleX.current = paddleX.current > 0 ? (paddleX.current - 60) : 0;
+        } else if(direction === "right") {
+            paddleX.current = paddleX.current < 250 ? (paddleX.current + 60) : 0;
+        }
+
+        window.requestAnimationFrame(drawPaddle);
+        canvasContext.current.clearRect(
+            0, 
+            canvasRef.current.height - PADDLE_HEIGHT, 
+            canvasRef.current.width, 
+            PADDLE_HEIGHT
+        );
+
+        if(!inGame.current) {
+            ballX.current = paddleX.current + PADDLE_WIDTH / 2;
+            window.requestAnimationFrame(drawBall);
+            canvasContext.current.clearRect(
+                0, 
+                canvasRef.current.height - (PADDLE_HEIGHT + BALL_RADIUS * 2), 
+                canvasRef.current.width, 
+                BALL_RADIUS * 2
+            );
+        }
+    }
+
 // --------- lose and reset handlers ---------
-
-
 
     function resetAllStates() {
         inGame.current = false;
@@ -156,6 +181,12 @@ function Breakout() {
 
     function handleGameOn() {
         setStartGame(true);
+
+        setTimeout(() => {
+            resetBall()
+            clearAll();
+            drawAll();
+        }, 100);
     }
 
 // --------- ball move handlers ---------
@@ -266,14 +297,15 @@ function Breakout() {
 
         drawAll();
 
-        window.addEventListener('mousemove', handleMousemove);
-        window.addEventListener('mousedown', handleMousemove);
+        if(canvasRef.current.width > 600) {
+            window.addEventListener('mousemove', handleMousemove);
+        }
+        
         canvasRef.current.addEventListener('click', handleClick);
         canvasRef.current.addEventListener('click', handleBallMove);
 
         return (() => {
             window.removeEventListener('mousemove', handleMousemove);
-            window.removeEventListener('mousedown', handleMousemove);
             canvasRef.current.removeEventListener('click', handleClick);
             canvasRef.current.removeEventListener('click', handleBallMove);
         })
@@ -286,9 +318,11 @@ function Breakout() {
             <ControlsFrame 
                 inGame={startGame}
                 setStart={handleGameOn}
+                showButtons={true}
+                buttonsList={['left', 'right']}
+                handleClick={handleControlButton}
             >
-                <canvas className='breakout__canvas' ref={canvasRef} >
-                </canvas>
+                <canvas className='canvas' ref={canvasRef} />
             </ControlsFrame>
         </>
     );

@@ -12,7 +12,7 @@
 .main__title {
     margin: 0;
     padding: 25px 0;
-    color: var(--color-purple);
+    color: var(--color-light);
     font-size: 40px;
     font-weight: 900;
 }
@@ -71,11 +71,11 @@
     margin: 0;
     padding: 0 35px;
     height: 65px;
-    color: var(--color-white);
+    color: var(--color-dark);
     box-sizing: border-box;
     border-radius: 65px;
     text-align: center;
-    background-color: var(--color-crimson);
+    background-color: var(--color-light);
     border: 0;
     transition: padding .3s linear;
 }
@@ -91,12 +91,12 @@
 }
 
 .main__link-button:hover {
-    border: 2px solid var(--color-purple);
-    background-color: var(--color-white);
+    border: 2px solid var(--color-light);
+    background-color: var(--color-dark);
 }
 
 .main__link-button:hover .main__link-title {
-    color: var(--color-purple);
+    color: var(--color-light);
     transform: scale(1.15);
     transition: transform .3s linear, line-height .3s linear;
 }

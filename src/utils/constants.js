@@ -8,14 +8,21 @@ export const FRAME_SIZES = {
     1280: {x: 800, y: 600},
     1023: {x: 690, y: 480},
     767: {x: 500, y: 350},
-    550: {x: 320, y: 380},
+    550: {x: 350, y: 450},
 }
 
-export const COLOR_CRIMSON = 'rgb(227, 72, 97)';
+export const COLOR_LIGHT = '#e89db4';
 
-export const COLOR_PURPLE = 'rgb(26, 10, 77)';
+export const COLOR_DARK = '#e89db4';
 
 // --------- Snake game ---------
+
+export const SNAKE_BLOCK_SIZES = {
+    800: 40,
+    690: 30,
+    500: 25,
+    350: 25,
+}
 
 export const SNAKE_POSSIBLE_DIRECTION = {
     up: ['KeyA', 'KeyD', 'ArrowLeft', 'ArrowRight', 'left', 'right'],

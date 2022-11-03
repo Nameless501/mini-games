@@ -52,9 +52,8 @@
     width: 800px;
     height: 600px;
     position: relative;
-    border: 2px solid var(--color-purple);
-    box-shadow: 3px 3px 10px var(--color-purple);
-    background-color: rgb(255, 255, 255, .5);
+    border: 2px solid var(--color-light);
+    box-shadow: 3px 3px 10px var(--color-light);
     overflow: hidden;
 }
 
@@ -77,8 +76,8 @@
 @media screen and (max-width: 550px) {
     .controls-frame__frame {
         margin: 15px 0 0;
-        width: 320px;
-        height: 380px;
+        width: 350px;
+        height: 450px;
     }
 }
 

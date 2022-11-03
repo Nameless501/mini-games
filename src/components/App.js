@@ -5,6 +5,7 @@ import RockPaperScissors from './RockPaperScissors';
 import Snake from './Snake.js';
 import Main from './Main.js';
 import Breakout from './Breakout';
+import Basketball from './Basketball';
 
 
 function App() {
@@ -23,6 +24,9 @@ function App() {
         </Route>
         <Route path='/breakout' >
           <Breakout />
+        </Route>
+        <Route path='/basketball' >
+          <Basketball />
         </Route>
       </Switch>
     </div>

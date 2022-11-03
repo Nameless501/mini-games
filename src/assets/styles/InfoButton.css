@@ -3,7 +3,7 @@
     width: 50px;
     height: 50px;
     box-sizing: border-box;
-    background-color: var(--color-crimson);
+    background-color: var(--color-light);
     border-radius: 50%;
     border: 0;
     display: flex;
@@ -31,8 +31,8 @@
 
 @media screen and (min-width: 768px) {
     .info-button:hover {
-        background-color: var(--color-white);
-        border: 1.5px solid var(--color-purple);
+        background-color: var(--color-dark);
+        border: 1.5px solid var(--color-light);
         cursor: pointer;
         transition: background-size .2s linear;
     }
@@ -51,12 +51,12 @@
 
 @media screen and (max-width: 767px) {
     .info-button {
-        width: 30px;
-        height: 30px;
+        width: 40px;
+        height: 40px;
     }
 
     .info-button__icon {
-        width: 15px;
-        height: 15px;
+        width: 23px;
+        height: 23px;
     }
 }

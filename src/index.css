@@ -1,8 +1,6 @@
 :root {
-  --color-pink: rgb(251, 235, 239);
-  --color-purple: rgb(26, 10, 77);
-  --color-white: rgb(255, 255, 255);
-  --color-crimson: rgb(227, 72, 97);
+  --color-dark: #145f48;
+  --color-light: #e89db4;
 }
 
 body {
@@ -13,7 +11,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-pink);
+  background-color: var(--color-dark);
 }
 
 code {
