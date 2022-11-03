@@ -1,7 +1,7 @@
 import { useState, useRef, useLayoutEffect } from 'react';
 import '../assets/styles/Canvas.css';
 import ControlsFrame from './ControlsFrame.js';
-import { COLOR_LIGHT, COLOR_DARK, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
+import { COLOR_LIGHT, COLOR_DARK, BALL_RADIUS } from '../utils/constants.js';
 import { getFrameSize } from '../utils/utils.js';
 
 function Basketball() {
@@ -10,11 +10,14 @@ function Basketball() {
     const canvasContext = useRef();
     const ballX = useRef();
     const ballY = useRef();
+    const initialBallX = useRef();
+    const initialBallY = useRef();
     const velocityX = useRef();
     const velocityY = useRef();
     const energy = useRef(20);
 
 // --------- draw handlers ---------
+
     /* function drawPaddle() {
         canvasContext.current.fillStyle = COLOR_LIGHT;
         canvasContext.current.fillRect(paddleX.current, paddleY.current, PADDLE_WIDTH, PADDLE_HEIGHT);
@@ -28,41 +31,131 @@ function Basketball() {
         canvasContext.current.closePath();
     }
 
+    function drawMaxRange() {
+        canvasContext.current.beginPath();
+        canvasContext.current.strokeStyle = COLOR_DARK;
+        canvasContext.current.moveTo(
+            initialBallX.current - 100 - BALL_RADIUS, 
+            initialBallY.current - 50 - BALL_RADIUS
+        );
+        canvasContext.current.lineTo(
+            initialBallX.current - 100 - BALL_RADIUS, 
+            initialBallY.current + 80
+        );
+        canvasContext.current.quadraticCurveTo(
+            initialBallX.current - 100 - BALL_RADIUS, 
+            initialBallY.current + 100 + BALL_RADIUS,
+            initialBallX.current - 80,
+            initialBallY.current + 100 + BALL_RADIUS
+        );
+        canvasContext.current.lineTo(
+            initialBallX.current,
+            initialBallY.current + 100 + BALL_RADIUS
+        );
+        canvasContext.current.stroke();
+        canvasContext.current.closePath();
+    }
+
+    function drawGuideLine() {
+        const maxX = initialBallX.current + velocityX.current * 15;
+        const maxY = initialBallY.current + velocityY.current * 15;
+        const endX = maxX + 50;
+        const endY = maxY + 10;
+
+
+        canvasContext.current.beginPath();
+        canvasContext.current.strokeStyle = COLOR_DARK;
+        canvasContext.current.moveTo(ballX.current, ballY.current);
+        canvasContext.current.quadraticCurveTo(maxX, maxY, endX, endY);
+        canvasContext.current.stroke();
+        canvasContext.current.closePath();
+    }
+
     function clearAll() {
         canvasContext.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
 
-    /* function drawAll() {
-        
-    } */
+    function drawAll() {
+        drawBall();
+    }
+
+    function drawAllWithGuide() {
+        drawMaxRange();
+        drawGuideLine();
+        drawBall();
+    }
 
 // --------- event handlers ---------
 
-    function handleMousemove(evt) {
-        const x = evt.clientX - canvasRef.current.parentElement.offsetLeft;
-        const y = evt.clientY - canvasRef.current.parentElement.offsetTop;
-        const rightBorder = canvasRef.current.width;
-        const bottom = canvasRef.current.height;
+    function getVelocity() {
+        const multiplierX = (initialBallX.current - ballX.current) / 10;
+        const multiplierY = (ballY.current - initialBallY.current) > 0 ?
+            ((ballY.current - initialBallY.current)) / 10 : 0;
 
-        if(inGame.current === false) {
-            if(x > 0 && x < rightBorder) {
-                ballX.current = x;
-            }
-    
-            if(y > 0 && y < bottom) {
-                ballY.current = y;
-            }
-    
-            window.requestAnimationFrame(drawBall);
-            clearAll();
+        velocityX.current = 0.75 * multiplierX;
+        velocityY.current = -0.75 * multiplierY;
+    }
+
+    function handleMouseMove(evt) {
+        const canvasPosition = canvasRef.current.parentElement.getBoundingClientRect();
+        const x = evt.pageX - canvasPosition.x;
+        const y = evt.pageY - canvasPosition.y;
+
+        const leftBorder = initialBallX.current - 100;
+        const topBorder = initialBallY.current - 50;
+        const bottomBorder = initialBallY.current + 100;
+
+        if(x > leftBorder && x < initialBallX.current) {
+            ballX.current = x;
+        }
+
+        if(y > topBorder && y < bottomBorder) {
+            ballY.current = y;
+        }
+
+        getVelocity();
+
+        window.requestAnimationFrame(drawAllWithGuide);
+        clearAll();
+    }
+
+    function checkClickOnBall(evt) {
+        const canvasPosition = canvasRef.current.parentElement.getBoundingClientRect();
+
+        const top = ballY.current - BALL_RADIUS;
+        const bottom = ballY.current + BALL_RADIUS;
+        const left = ballX.current - BALL_RADIUS;
+        const right = ballX.current + BALL_RADIUS;
+
+        const evtX = evt.pageX - canvasPosition.x;
+        const evtY = evt.pageY - canvasPosition.y;
+
+        const clickInside = evtX > left && evtX < right &&
+            evtY > top && evtY < bottom
+
+        return clickInside;
+    }
+
+    function handleMouseDown(evt) {
+        const isClickedOnBall = checkClickOnBall(evt);
+
+        if(isClickedOnBall) {
+            canvasRef.current.addEventListener('mousemove', handleMouseMove);
+            canvasRef.current.addEventListener('mouseup', handleMouseUp);
         }
     }
 
-    function handleClick() {
+    function handleMouseUp() {
+        canvasRef.current.removeEventListener('mousemove', handleMouseMove);
+        canvasRef.current.addEventListener('mouseup', handleMouseUp);
+
         inGame.current = true;
 
         handleBallMove();
     }
+
+    
+
 
 // --------- lose and reset handlers ---------
 
@@ -82,6 +175,8 @@ function Basketball() {
 
         ballX.current = x;
         ballY.current = y;
+        initialBallX.current = x;
+        initialBallY.current = y;
     }
 
     function checkBallDirection() {
@@ -119,7 +214,7 @@ function Basketball() {
             checkBallDirection();
             makeBallMove();
             clearAll();
-            drawBall();
+            drawAll();
 
             velocityY.current = velocityY.current < 0 ? velocityY.current + 0.075 : velocityY.current + 0.15;
         }
@@ -134,17 +229,15 @@ function Basketball() {
         canvasContext.current = canvasRef.current.getContext('2d');
 
         setInitialBallPosition();
-        drawBall();
+        drawAll();
 
         velocityX.current = 3;
         velocityY.current = -6;
 
-        window.addEventListener('mousedown', handleMousemove);
-        //canvasRef.current.addEventListener('click', handleClick);
+        canvasRef.current.addEventListener('mousedown', handleMouseDown);
 
         return (() => {
-            window.removeEventListener('mousemove', handleMousemove);
-            canvasRef.current.removeEventListener('click', handleClick);
+            canvasRef.current.removeEventListener('mousedown', handleMouseDown);
         })
     }, []);
 

@@ -83,8 +83,8 @@
 .main__link-title {
     margin: 0;
     padding: 0;
-    font-size: 25px;
-    line-height: 25px;
+    font-size: 22px;
+    line-height: 22px;
     font-weight: 700;
     transform: scale(1);
     transition: transform .3s linear, line-height .3s linear;
@@ -97,7 +97,7 @@
 
 .main__link-button:hover .main__link-title {
     color: var(--color-light);
-    transform: scale(1.15);
+    transform: scale(1.1);
     transition: transform .3s linear, line-height .3s linear;
 }
 
