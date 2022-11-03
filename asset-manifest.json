@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/mini-games/static/css/main.d3c6862b.css",
-    "main.js": "/mini-games/static/js/main.7993a5c0.js",
+    "main.css": "/mini-games/static/css/main.b7a65be1.css",
+    "main.js": "/mini-games/static/js/main.04d4a532.js",
     "static/js/787.f7d43f86.chunk.js": "/mini-games/static/js/787.f7d43f86.chunk.js",
-    "static/media/question-purple.svg": "/mini-games/static/media/question-purple.9968363cf0e161c6dc90.svg",
-    "static/media/question-white.svg": "/mini-games/static/media/question-white.55ef7bb2b4cd4335bfc7.svg",
-    "static/media/scissors-purple.svg": "/mini-games/static/media/scissors-purple.3817c69657d48bc082a2.svg",
-    "static/media/scissors-white.svg": "/mini-games/static/media/scissors-white.87236648fbd0054852097051c06d5418.svg",
-    "static/media/rock-purple.svg": "/mini-games/static/media/rock-purple.8f9b55e284a450378bca.svg",
-    "static/media/rock-white.svg": "/mini-games/static/media/rock-white.d23d426320bf3113e5f664a06c148ebf.svg",
-    "static/media/paper-purple.svg": "/mini-games/static/media/paper-purple.08b8b401f633212d552d.svg",
-    "static/media/paper-white.svg": "/mini-games/static/media/paper-white.9fcca36772b6a49b43a18b48db397248.svg",
+    "static/media/question-purple.svg": "/mini-games/static/media/question-purple.795a8e81314ca8f86d71.svg",
+    "static/media/question-white.svg": "/mini-games/static/media/question-white.20c9f96ea80c78c37b3b.svg",
+    "static/media/scissors-purple.svg": "/mini-games/static/media/scissors-purple.8eb7058bd62446f87edc.svg",
+    "static/media/scissors-white.svg": "/mini-games/static/media/scissors-white.b95ee959106bf02828b706cb2bc75371.svg",
+    "static/media/rock-purple.svg": "/mini-games/static/media/rock-purple.e6e0ce771681c102c198.svg",
+    "static/media/rock-white.svg": "/mini-games/static/media/rock-white.4ca3eabb4959be786cbf763e6973f0d2.svg",
+    "static/media/paper-purple.svg": "/mini-games/static/media/paper-purple.664521ae1be4d015fb66.svg",
+    "static/media/paper-white.svg": "/mini-games/static/media/paper-white.fa7db2951986bc3c9121aea1446a63b0.svg",
     "index.html": "/mini-games/index.html",
-    "static/media/close-purple.svg": "/mini-games/static/media/close-purple.367f903bb5491fddf154.svg",
-    "static/media/close-white.svg": "/mini-games/static/media/close-white.ad98de32e342afafa118.svg",
-    "main.d3c6862b.css.map": "/mini-games/static/css/main.d3c6862b.css.map",
-    "main.7993a5c0.js.map": "/mini-games/static/js/main.7993a5c0.js.map",
+    "static/media/close-purple.svg": "/mini-games/static/media/close-purple.24c09a938a5f21567703.svg",
+    "static/media/close-white.svg": "/mini-games/static/media/close-white.109f6d2d626d29a8d3f6.svg",
+    "main.b7a65be1.css.map": "/mini-games/static/css/main.b7a65be1.css.map",
+    "main.04d4a532.js.map": "/mini-games/static/js/main.04d4a532.js.map",
     "787.f7d43f86.chunk.js.map": "/mini-games/static/js/787.f7d43f86.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.d3c6862b.css",
-    "static/js/main.7993a5c0.js"
+    "static/css/main.b7a65be1.css",
+    "static/js/main.04d4a532.js"
   ]
 }
