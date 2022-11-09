@@ -3,6 +3,9 @@ import '../assets/styles/Canvas.css';
 import ControlsFrame from './ControlsFrame.js';
 import { COLOR_LIGHT, COLOR_DARK, BALL_RADIUS } from '../utils/constants.js';
 import { getFrameSize } from '../utils/utils.js';
+import useFiguresRender from '../hooks/useFiguresRender.js';
+import useCollisionCheck from '../hooks/useCollisionCheck.js';
+import useMousePosition from '../hooks/useMousePosition.js';
 
 function Basketball() {
     const inGame = useRef(false);
@@ -12,31 +15,57 @@ function Basketball() {
     const ballY = useRef();
     const initialBallX = useRef();
     const initialBallY = useRef();
+    const targetX = useRef();
+    const targetY = useRef();
     const velocityX = useRef();
     const velocityY = useRef();
     const energy = useRef(20);
 
+// --------- custom hooks ---------
+
+    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender();
+    const [checkFrameOverflow, checkCollision] = useCollisionCheck();
+    const getPositionInCanvas = useMousePosition();
+
+// --------- initial states handlers ---------
+
+    function setCanvasSize() {
+        const frame = getFrameSize();
+        canvasRef.current.width = frame.x;
+        canvasRef.current.height = frame.y;
+    }
+
+    function getBallData() {
+        return {
+            top: ballY.current - BALL_RADIUS, 
+            bottom: ballY.current + BALL_RADIUS,
+            left: ballX.current - BALL_RADIUS,
+            right: ballX.current + BALL_RADIUS,
+        }
+    }
+
 // --------- draw handlers ---------
 
-    /* function drawPaddle() {
-        canvasContext.current.fillStyle = COLOR_LIGHT;
-        canvasContext.current.fillRect(paddleX.current, paddleY.current, PADDLE_WIDTH, PADDLE_HEIGHT);
-    } */
-
     function drawBall() {
-        canvasContext.current.beginPath();
-        canvasContext.current.fillStyle = COLOR_DARK;
-        canvasContext.current.arc(ballX.current, ballY.current, BALL_RADIUS, 0, Math.PI * 2, false);
-        canvasContext.current.fill();
-        canvasContext.current.closePath();
+        renderCircle(canvasContext.current, ballX.current, ballY.current, BALL_RADIUS);
     }
 
     function drawMaxRange() {
         canvasContext.current.beginPath();
         canvasContext.current.strokeStyle = COLOR_DARK;
         canvasContext.current.moveTo(
+            initialBallX.current, 
+            initialBallY.current - 100 - BALL_RADIUS
+        );
+        canvasContext.current.lineTo(
+            initialBallX.current - 80 - BALL_RADIUS, 
+            initialBallY.current - 100 - BALL_RADIUS
+        );
+        canvasContext.current.quadraticCurveTo(
             initialBallX.current - 100 - BALL_RADIUS, 
-            initialBallY.current - 50 - BALL_RADIUS
+            initialBallY.current - 100 - BALL_RADIUS,
+            initialBallX.current - 100 - BALL_RADIUS,
+            initialBallY.current - 80
         );
         canvasContext.current.lineTo(
             initialBallX.current - 100 - BALL_RADIUS, 
@@ -57,18 +86,32 @@ function Basketball() {
     }
 
     function drawGuideLine() {
-        const maxX = initialBallX.current + velocityX.current * 15;
-        const maxY = initialBallY.current + velocityY.current * 15;
-        const endX = maxX + 50;
-        const endY = maxY + 10;
+        const endX = initialBallX.current + velocityX.current * 10;
+        const endY = initialBallY.current + velocityY.current * 10;
+        const arrowY = initialBallY.current + velocityY.current * 8;
+        const arrowX = initialBallX.current + velocityX.current * 8;
 
 
         canvasContext.current.beginPath();
         canvasContext.current.strokeStyle = COLOR_DARK;
         canvasContext.current.moveTo(ballX.current, ballY.current);
-        canvasContext.current.quadraticCurveTo(maxX, maxY, endX, endY);
+        canvasContext.current.lineTo(endX, endY);
+
+        // стрелку бы переделать
+
+        canvasContext.current.moveTo(arrowX, arrowY - 5);
+        canvasContext.current.lineTo(endX, endY);
+        canvasContext.current.moveTo(arrowX, arrowY + 5);
+        canvasContext.current.lineTo(endX, endY);
+
+        // -----------------------
+
         canvasContext.current.stroke();
         canvasContext.current.closePath();
+    }
+
+    function drawTarget() {
+        renderEllipse(canvasContext.current, targetX.current, targetY.current, BALL_RADIUS * 2, BALL_RADIUS);
     }
 
     function clearAll() {
@@ -76,33 +119,33 @@ function Basketball() {
     }
 
     function drawAll() {
+        drawTarget();
         drawBall();
     }
 
     function drawAllWithGuide() {
         drawMaxRange();
         drawGuideLine();
-        drawBall();
+        drawAll();
     }
 
 // --------- event handlers ---------
 
     function getVelocity() {
         const multiplierX = (initialBallX.current - ballX.current) / 10;
-        const multiplierY = (ballY.current - initialBallY.current) > 0 ?
-            ((ballY.current - initialBallY.current)) / 10 : 0;
+        /* const multiplierY = (ballY.current - initialBallY.current) > 0 ?
+            ((ballY.current - initialBallY.current)) / 10 : 0; */
+        const multiplierY = (ballY.current - initialBallY.current) / 10;
 
         velocityX.current = 0.75 * multiplierX;
         velocityY.current = -0.75 * multiplierY;
     }
 
     function handleMouseMove(evt) {
-        const canvasPosition = canvasRef.current.parentElement.getBoundingClientRect();
-        const x = evt.pageX - canvasPosition.x;
-        const y = evt.pageY - canvasPosition.y;
+        const [x, y] = getPositionInCanvas(evt, canvasRef.current);
 
         const leftBorder = initialBallX.current - 100;
-        const topBorder = initialBallY.current - 50;
+        const topBorder = initialBallY.current - 100;
         const bottomBorder = initialBallY.current + 100;
 
         if(x > leftBorder && x < initialBallX.current) {
@@ -120,18 +163,11 @@ function Basketball() {
     }
 
     function checkClickOnBall(evt) {
-        const canvasPosition = canvasRef.current.parentElement.getBoundingClientRect();
+        const [x, y] = getPositionInCanvas(evt, canvasRef.current);
+        const ball = getBallData();
 
-        const top = ballY.current - BALL_RADIUS;
-        const bottom = ballY.current + BALL_RADIUS;
-        const left = ballX.current - BALL_RADIUS;
-        const right = ballX.current + BALL_RADIUS;
-
-        const evtX = evt.pageX - canvasPosition.x;
-        const evtY = evt.pageY - canvasPosition.y;
-
-        const clickInside = evtX > left && evtX < right &&
-            evtY > top && evtY < bottom
+        const clickInside = x > ball.left && x < ball.right &&
+            y > ball.top && y < ball.bottom
 
         return clickInside;
     }
@@ -154,9 +190,6 @@ function Basketball() {
         handleBallMove();
     }
 
-    
-
-
 // --------- lose and reset handlers ---------
 
     function resetAllStates() {
@@ -164,14 +197,50 @@ function Basketball() {
     }
 
     function resetBall() {
-        
+        setInitialBallPosition();
+        clearAll();
+        drawAll();
+    }
+
+// --------- target handlers ---------
+
+    function setInitialTargetPosition() {
+        const y = (canvasRef.current.height * 2) / 3 - BALL_RADIUS;
+        const x = (canvasRef.current.width * 3) / 4 - BALL_RADIUS;
+    
+        targetX.current = x;
+        targetY.current = y;
+    }
+
+// --------- collision handlers ---------
+
+    function checkFrameCollision() {
+        const ball = getBallData()
+        const [overflowRight, overflowLeft, overflowTop, overflowBottom] = checkFrameOverflow(
+            ball,
+            canvasRef.current.width,
+            canvasRef.current.height,
+        )
+        const overflowX = overflowLeft || overflowRight;
+        const overflowY = overflowTop || overflowBottom;
+
+        velocityX.current = overflowX ? (velocityX.current * -1) : velocityX.current;
+        velocityY.current = overflowY ? (velocityY.current * -0.5) : velocityY.current;
+
+        if(overflowY && energy.current > 0) {
+            energy.current -= 1;
+            velocityX.current = velocityX.current < 0 ? velocityX.current + 0.1 : velocityX.current - 0.1;
+        }
+        if(overflowX && energy.current > 0) {
+            velocityX.current *= 0.7;
+        }
     }
 
 // --------- ball move handlers ---------
 
     function setInitialBallPosition() {
         const y = (canvasRef.current.height * 2) / 3 - BALL_RADIUS;
-        const x = canvasRef.current.width / 3 - BALL_RADIUS;
+        const x = canvasRef.current.width / 4 - BALL_RADIUS;
 
         ballX.current = x;
         ballY.current = y;
@@ -223,12 +292,11 @@ function Basketball() {
 // --------- useLayoutEffect ---------
 
     useLayoutEffect(() => {
-        const frame = getFrameSize();
-        canvasRef.current.width = frame.x;
-        canvasRef.current.height = frame.y;
+        setCanvasSize();
         canvasContext.current = canvasRef.current.getContext('2d');
 
         setInitialBallPosition();
+        setInitialTargetPosition();
         drawAll();
 
         velocityX.current = 3;

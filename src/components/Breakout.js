@@ -3,6 +3,9 @@ import '../assets/styles/Canvas.css'
 import ControlsFrame from './ControlsFrame.js';
 import { COLOR_LIGHT, COLOR_DARK, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
 import { getFrameSize } from '../utils/utils.js';
+import useFiguresRender from '../hooks/useFiguresRender.js';
+import useCollisionCheck from '../hooks/useCollisionCheck.js';
+import useMousePosition from '../hooks/useMousePosition.js';
 
 function Breakout() {
     const [startGame, setStartGame] = useState(false);
@@ -21,57 +24,91 @@ function Breakout() {
     const scoreCount = useRef(0);
     const livesCount = useRef(3);
 
-// --------- draw handlers ---------
+// --------- custom hooks ---------
 
-    function drawScoreCounter() {
-        canvasContext.current.font = `${FONT_SIZE}px Segoe UI`;
-        canvasContext.current.fillStyle = COLOR_DARK;
-        canvasContext.current.fillText(`Score: ${scoreCount.current}`, 10, FONT_SIZE);
-    }
+    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender();
+    const [checkFrameOverflow, checkCollision] = useCollisionCheck();
+    const getPositionInCanvas = useMousePosition();
 
-    function drawLivesCounter() {
-        const right = canvasRef.current.width - 75;
+// --------- initial states handlers ---------
 
-        canvasContext.current.font = `${FONT_SIZE}px Segoe UI`;
-        canvasContext.current.fillStyle = COLOR_DARK;
-        canvasContext.current.fillText(`Lives: ${livesCount.current}`, right, FONT_SIZE);
-    }
-
-    function drawPaddle() {
-        canvasContext.current.fillStyle = COLOR_LIGHT;
-        canvasContext.current.fillRect(paddleX.current, paddleY.current, PADDLE_WIDTH, PADDLE_HEIGHT);
+    function setCanvasSize() {
+        const frame = getFrameSize();
+        canvasRef.current.width = frame.x;
+        canvasRef.current.height = frame.y;
     }
 
     function createBricks() {
         const bricks = [];
-
         for(let i = 0; i < ROWS; i++) {
             for(let j = 0; j < COLUMNS; j++) {
                 const currentX = BRICK_PADDING + j * brickWidth.current;
                 const currentY  = (BRICK_PADDING * 2) + (i * (BRICK_HEIGHT + BRICK_PADDING));
-
-                bricks.push({x: currentX, y: currentY, on: true});
+                bricks.push({
+                    left: currentX, 
+                    top: currentY,
+                    right: currentX + brickWidth.current,
+                    bottom: currentY + BRICK_HEIGHT,
+                    on: true
+                });
             }
         }
-
         return bricks;
+    }
+
+    function getBallData() {
+        return {
+            top: ballY.current - BALL_RADIUS, 
+            bottom: ballY.current + BALL_RADIUS,
+            left: ballX.current - BALL_RADIUS,
+            right: ballX.current + BALL_RADIUS,
+        }
+    }
+
+// --------- draw handlers ---------
+
+    function drawCounters() {
+        renderText(
+            canvasContext.current,
+            `Score: ${scoreCount.current}`,
+            10,
+            FONT_SIZE
+        )
+
+        renderText(
+            canvasContext.current,
+            `Lives: ${livesCount.current}`,
+            canvasRef.current.width - 75,
+            FONT_SIZE
+        )
+    }
+
+    function drawPaddle() {
+        renderRect(
+            canvasContext.current,
+            paddleX.current, 
+            paddleY.current, 
+            PADDLE_WIDTH, 
+            PADDLE_HEIGHT
+        );
     }
 
     function drawBricks() {
         bricks.current.forEach(item => {
             if(item.on === true) {
-                canvasContext.current.fillStyle = COLOR_LIGHT;
-                canvasContext.current.fillRect(item.x, item.y, brickWidth.current - BRICK_PADDING, BRICK_HEIGHT);
+                renderRect(
+                    canvasContext.current,
+                    item.left, 
+                    item.top, 
+                    brickWidth.current - BRICK_PADDING, 
+                    BRICK_HEIGHT
+                );
             }
         })
     }
 
     function drawBall() {
-        canvasContext.current.beginPath();
-        canvasContext.current.fillStyle = COLOR_DARK;
-        canvasContext.current.arc(ballX.current, ballY.current, BALL_RADIUS, 0, Math.PI * 2, false);
-        canvasContext.current.fill();
-        canvasContext.current.closePath();
+        renderCircle(canvasContext.current, ballX.current,  ballY.current,  BALL_RADIUS);
     }
 
     function clearAll() {
@@ -82,14 +119,13 @@ function Breakout() {
         drawPaddle();
         drawBall();
         drawBricks();
-        drawScoreCounter();
-        drawLivesCounter();
+        drawCounters();
     }
 
 // --------- event handlers ---------
 
     function handleMousemove(evt) {
-        const x = evt.clientX - canvasRef.current.parentElement.offsetLeft;
+        const [x, y] = getPositionInCanvas(evt, canvasRef.current);
         const rightBorder = canvasRef.current.width - PADDLE_WIDTH;
 
         if(x > 0 && x < rightBorder) {
@@ -100,27 +136,19 @@ function Breakout() {
             paddleX.current = rightBorder;
         }
 
-        window.requestAnimationFrame(drawPaddle);
-        canvasContext.current.clearRect(
-            0, 
-            canvasRef.current.height - PADDLE_HEIGHT, 
-            canvasRef.current.width, 
-            PADDLE_HEIGHT
-        );
-
         if(!inGame.current) {
             ballX.current = paddleX.current + PADDLE_WIDTH / 2;
-            window.requestAnimationFrame(drawBall);
-            canvasContext.current.clearRect(
-                0, 
-                canvasRef.current.height - (PADDLE_HEIGHT + BALL_RADIUS * 2), 
-                canvasRef.current.width, 
-                BALL_RADIUS * 2
-            );
         }
+
+        clearAll();
+        drawAll();
     }
 
     function handleClick() {
+        if(!inGame.current) {
+            handleBallMove();
+        }
+
         inGame.current = true;
     }
 
@@ -131,24 +159,12 @@ function Breakout() {
             paddleX.current = paddleX.current < 250 ? (paddleX.current + 60) : 0;
         }
 
-        window.requestAnimationFrame(drawPaddle);
-        canvasContext.current.clearRect(
-            0, 
-            canvasRef.current.height - PADDLE_HEIGHT, 
-            canvasRef.current.width, 
-            PADDLE_HEIGHT
-        );
-
         if(!inGame.current) {
             ballX.current = paddleX.current + PADDLE_WIDTH / 2;
-            window.requestAnimationFrame(drawBall);
-            canvasContext.current.clearRect(
-                0, 
-                canvasRef.current.height - (PADDLE_HEIGHT + BALL_RADIUS * 2), 
-                canvasRef.current.width, 
-                BALL_RADIUS * 2
-            );
         }
+
+        clearAll();
+        drawAll();
     }
 
 // --------- lose and reset handlers ---------
@@ -157,7 +173,7 @@ function Breakout() {
         inGame.current = false;
 
         directionX.current = BALL_VELOCITY;
-        directionY.current = BALL_VELOCITY;
+        directionY.current = BALL_VELOCITY * -1;
 
         paddleX.current = (canvasRef.current.width / 2) - (PADDLE_WIDTH / 2);
         paddleY.current = canvasRef.current.height - PADDLE_HEIGHT;
@@ -186,7 +202,7 @@ function Breakout() {
             resetBall()
             clearAll();
             drawAll();
-        }, 100);
+        }, 0);
     }
 
 // --------- ball move handlers ---------
@@ -198,10 +214,8 @@ function Breakout() {
             const brick = bricks.current[i];
 
             if(brick.on === true) {
-                const collision = ballX.current > (brick.x - BALL_RADIUS) && 
-                ballX.current < (brick.x + brickWidth.current + BALL_RADIUS) &&
-                ballY.current > (brick.y - BALL_RADIUS) && 
-                ballY.current < (brick.y + BRICK_HEIGHT + BALL_RADIUS);
+                const ball = getBallData();
+                const collision = checkCollision(ball, brick);
 
                 if(collision) {
                     brick.on = false;
@@ -226,38 +240,53 @@ function Breakout() {
         resetAllStates();
 
         setTimeout(() => {
-            resetBall()
+            resetBall();
             clearAll();
             drawAll();
-        }, 100);
+        }, 0);
 
         if(--livesCount.current < 1) {
             handleGameOver();
         }
     }
 
-    function checkBallDirection() {
-        const bottom = canvasRef.current.height;
-        const right = canvasRef.current.width - BALL_RADIUS;
-        const top = BALL_RADIUS;
-        const left = BALL_RADIUS;
-        const paddleLeft = paddleX.current - BALL_RADIUS;
-        const paddleRight = paddleX.current + PADDLE_WIDTH + BALL_RADIUS;
+    function checkFrameCollision() {
+        const ball = getBallData()
 
-        const overflowX = (ballX.current + directionX.current) > right || (ballX.current + directionX.current) < left;
-        const overflowY = (ballY.current + directionY.current) < top;
-        const paddleCollision = ballX.current <= paddleRight && 
-            ballX.current >= paddleLeft && 
-            ballY.current === (paddleY.current - BALL_RADIUS);
+        const [overflowRight, overflowLeft, overflowTop, overflowBottom] = checkFrameOverflow(
+            ball,
+            canvasRef.current.width,
+            canvasRef.current.height,
+        )
 
-        const bottomOverflow = ballY.current > bottom;
+        directionX.current = overflowRight || overflowLeft ? (directionX.current * -1) : directionX.current;
+        directionY.current = overflowTop ? (directionY.current * -1) : directionY.current;
 
-        directionX.current = overflowX ? (directionX.current * -1) : directionX.current;
-        directionY.current = overflowY || paddleCollision ? (directionY.current * -1) : directionY.current;
-
-        if(bottomOverflow) {
+        if(overflowBottom) {
             handleBottomOverflow();
         }
+    }
+
+    function checkPaddleCollision() {
+        if(inGame.current) {
+            const paddle = {
+                top: paddleY.current, 
+                bottom: paddleY.current + PADDLE_HEIGHT,
+                left: paddleX.current,
+                right: paddleX.current + PADDLE_WIDTH,
+            }
+            const ball = getBallData();
+
+            const collision = checkCollision(ball, paddle);
+
+            directionY.current = collision ? (directionY.current * -1) : directionY.current;
+        }
+    }
+
+    function checkBallDirection() {
+        checkFrameCollision();
+
+        checkPaddleCollision();
 
         checkBrickCollision();
     }
@@ -268,13 +297,10 @@ function Breakout() {
     }
 
     function handleBallMove() {
-        if(inGame.current === true) {
-            animation.current = requestAnimationFrame(handleBallMove);
-        }
+        animation.current = requestAnimationFrame(handleBallMove);
 
         checkBallDirection();
         makeBallMove();
-
         clearAll();
         drawAll();
     }
@@ -282,10 +308,7 @@ function Breakout() {
 // --------- useLayoutEffect ---------
 
     useLayoutEffect(() => {
-        const frame = getFrameSize();
-
-        canvasRef.current.width = frame.x;
-        canvasRef.current.height = frame.y;
+        setCanvasSize();
 
         canvasContext.current = canvasRef.current.getContext('2d');
         brickWidth.current = (canvasRef.current.width - BRICK_PADDING) / COLUMNS;
@@ -302,12 +325,10 @@ function Breakout() {
         }
         
         canvasRef.current.addEventListener('click', handleClick);
-        canvasRef.current.addEventListener('click', handleBallMove);
 
         return (() => {
             window.removeEventListener('mousemove', handleMousemove);
             canvasRef.current.removeEventListener('click', handleClick);
-            canvasRef.current.removeEventListener('click', handleBallMove);
         })
     }, []);
 
