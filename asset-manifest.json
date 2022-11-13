@@ -1,25 +1,15 @@
 {
   "files": {
-    "main.css": "/mini-games/static/css/main.377ddbaf.css",
-    "main.js": "/mini-games/static/js/main.0a739c73.js",
+    "main.css": "/mini-games/static/css/main.894b206c.css",
+    "main.js": "/mini-games/static/js/main.7d9bfba8.js",
     "static/js/787.f7d43f86.chunk.js": "/mini-games/static/js/787.f7d43f86.chunk.js",
-    "static/media/question-purple.svg": "/mini-games/static/media/question-purple.795a8e81314ca8f86d71.svg",
-    "static/media/question-white.svg": "/mini-games/static/media/question-white.20c9f96ea80c78c37b3b.svg",
-    "static/media/scissors-purple.svg": "/mini-games/static/media/scissors-purple.8eb7058bd62446f87edc.svg",
-    "static/media/scissors-white.svg": "/mini-games/static/media/scissors-white.b95ee959106bf02828b706cb2bc75371.svg",
-    "static/media/rock-purple.svg": "/mini-games/static/media/rock-purple.e6e0ce771681c102c198.svg",
-    "static/media/rock-white.svg": "/mini-games/static/media/rock-white.4ca3eabb4959be786cbf763e6973f0d2.svg",
-    "static/media/paper-purple.svg": "/mini-games/static/media/paper-purple.664521ae1be4d015fb66.svg",
-    "static/media/paper-white.svg": "/mini-games/static/media/paper-white.fa7db2951986bc3c9121aea1446a63b0.svg",
     "index.html": "/mini-games/index.html",
-    "static/media/close-purple.svg": "/mini-games/static/media/close-purple.24c09a938a5f21567703.svg",
-    "static/media/close-white.svg": "/mini-games/static/media/close-white.109f6d2d626d29a8d3f6.svg",
-    "main.377ddbaf.css.map": "/mini-games/static/css/main.377ddbaf.css.map",
-    "main.0a739c73.js.map": "/mini-games/static/js/main.0a739c73.js.map",
+    "main.894b206c.css.map": "/mini-games/static/css/main.894b206c.css.map",
+    "main.7d9bfba8.js.map": "/mini-games/static/js/main.7d9bfba8.js.map",
     "787.f7d43f86.chunk.js.map": "/mini-games/static/js/787.f7d43f86.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.377ddbaf.css",
-    "static/js/main.0a739c73.js"
+    "static/css/main.894b206c.css",
+    "static/js/main.7d9bfba8.js"
   ]
 }
