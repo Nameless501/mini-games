@@ -3,16 +3,15 @@ import ControlsFrame from './ControlsFrame.js';
 import { getRandomNumber } from '../utils/utils.js';
 import { RPS_CONFIG } from '../utils/constants.js';
 import '../assets/styles/RockPaperScissors.css';
+import RockPaperScissorsIcons from './RockPaperScissorsIcons.js';
 
 function RockPaperScissors() {
-    const [frameSize, setFrameSize] = useState({x: 800, y: 600});
     const [inGame, setGameState] = useState(false);
     const [isActive, setIsActive] = useState(false);
-    const roundCount = useRef(1);
+    const roundCount = useRef(0);
     const opponentScore = useRef(0);
     const userScore = useRef(0);
-    const userBetRef = useRef();
-    const opponentBetRef = useRef();
+    const [bets, setBets] = useState({ user: {name: ''}, opponent: {name: ''} });
 
 // reset all to default
 
@@ -20,55 +19,60 @@ function RockPaperScissors() {
         opponentScore.current = 0;
         userScore.current = 0;
         setGameState(true);
-        roundCount.current = 1;
+        roundCount.current = 0;
     }
 
-// 
+// bets and result handlers
 
     function getOpponentBet() {
         const bet = {...RPS_CONFIG[getRandomNumber(0, RPS_CONFIG.length - 1)]};
 
-        opponentBetRef.current.style.backgroundImage = `url(${bet.img})`;
-
-        return bet;
+        setBets(current => ({
+            ...current,
+            opponent: bet,
+        }));
     }
 
     function getUserBet(evt) {
-        const bet = {...RPS_CONFIG.find(item => item.name === evt.target.value)};
+        const bet = {...RPS_CONFIG.find(item => item.name === evt.currentTarget.value)};
 
-        userBetRef.current.style.backgroundImage = `url(${bet.img})`;
-
-        return bet;
+        setBets(current => ({
+            ...current,
+            user: bet,
+        }));
     }
 
-    function checkWinner(userBet, opponentBet) {
-        if(userBet.name === opponentBet.beat) {
+    function checkWinner() {
+        if(bets.user.name === bets.opponent.beat) {
             setTimeout(() => {
                 opponentScore.current += 1;;
             }, 1000);
-        } else if(userBet.beat === opponentBet.name) {
+        } else if(bets.user.beat === bets.opponent.name) {
             setTimeout(() => {
                 userScore.current += 1;;
             }, 1000);
         }
-
-        setTimeout(() => {
-            roundCount.current += 1;;
-        }, 1000);
     }
 
     function handleClick(evt) {
-        const userBet = getUserBet(evt);
-        const opponentBet = getOpponentBet();
+        getUserBet(evt);
+        getOpponentBet();
 
-        setIsActive(true);
-
-        checkWinner(userBet, opponentBet);
-
-        setTimeout(() => {
-            setIsActive(false);
-        }, 2000);
+        roundCount.current += 1;
     }
+
+    useEffect(() => {
+        checkWinner();
+
+        if(roundCount.current >= 1) {
+            setIsActive(true);
+        
+
+            setTimeout(() => {
+                setIsActive(false);
+            }, 2000);
+        }
+    }, [bets])
 
 // JSX
 
@@ -78,7 +82,6 @@ function RockPaperScissors() {
                 inGame={inGame}
                 setStart={setAllToDefault}
                 score={0}
-                setFrameSize={setFrameSize}
             >
                 <div className="rock-paper-scissors__frame" >
                     <p className='rock-paper-scissors__round-counter'>
@@ -109,8 +112,9 @@ function RockPaperScissors() {
                                     rock-paper-scissors__user-bet
                                     ${isActive && 'rock-paper-scissors__bet-suggest_active'}
                                 `}
-                                ref={userBetRef}
-                            />
+                            >
+                                <RockPaperScissorsIcons name={bets.user.name} sizeBig={true} />
+                            </div>
                         </div>
                         <div className="rock-paper-scissors__bet">
                             Opponent
@@ -119,8 +123,9 @@ function RockPaperScissors() {
                                     rock-paper-scissors__opponent-bet
                                     ${isActive && 'rock-paper-scissors__bet-suggest_active'}
                                 `}
-                                ref={opponentBetRef}
-                            />
+                            >
+                                <RockPaperScissorsIcons name={bets.opponent.name} sizeBig={true} />
+                            </div>
                         </div>
                     </div>
                     <div className="rock-paper-scissors__controls">
@@ -129,31 +134,34 @@ function RockPaperScissors() {
                                 <button 
                                     type="button" 
                                     value="rock"
-                                    className="rock-paper-scissors__control-button 
-                                        rock-paper-scissors__control-button_type_rock"
+                                    className="rock-paper-scissors__control-button"
                                     onClick={handleClick}
                                     disabled={isActive ? true : false}
-                                />
+                                >
+                                    <RockPaperScissorsIcons name="rock" />
+                                </button>
                             </li>
                             <li>
                                 <button 
                                     type="button" 
                                     value="paper"
-                                    className="rock-paper-scissors__control-button 
-                                        rock-paper-scissors__control-button_type_paper" 
+                                    className="rock-paper-scissors__control-button"
                                     onClick={handleClick}
                                     disabled={isActive ? true : false}
-                                />
+                                >
+                                    <RockPaperScissorsIcons name="paper" />
+                                </button>
                             </li>
                             <li>
                                 <button 
                                     type="button" 
                                     value="scissors"
-                                    className="rock-paper-scissors__control-button 
-                                        rock-paper-scissors__control-button_type_scissors"
+                                    className="rock-paper-scissors__control-button"
                                     onClick={handleClick}
                                     disabled={isActive ? true : false}
-                                />
+                                >
+                                    <RockPaperScissorsIcons name="scissors" />
+                                </button>
                             </li>
                         </ul>
                     </div>

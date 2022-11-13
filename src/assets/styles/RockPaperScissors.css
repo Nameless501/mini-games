@@ -112,6 +112,9 @@
     font-weight: 700;
     line-height: 125px;
     vertical-align: middle;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
 }
 
 @media screen and (max-width: 767px) {
@@ -153,43 +156,13 @@
     box-sizing: border-box;
     background-color: var(--color-light);
     border: 2px solid var(--color-dark);
-    background-repeat: no-repeat;
-    background-size: 50px 50px;
-    background-position: center;
-    transition: background-size .2s linear;
-}
-
-.rock-paper-scissors__control-button_type_rock {
-    background-image: url('../images/rock-white.svg');
-}
-
-.rock-paper-scissors__control-button_type_paper {
-    background-image: url('../images/paper-white.svg');
-}
-
-.rock-paper-scissors__control-button_type_scissors {
-    background-image: url('../images/scissors-white.svg');
 }
 
 @media screen and (min-width: 768px) {
     .rock-paper-scissors__control-button:hover {
-        background-size: 55px 55px;
         background-color: var(--color-dark);
         border: 2px solid var(--color-light);
         cursor: pointer;
-        transition: background-size .2s linear;
-    }
-    
-    .rock-paper-scissors__control-button_type_rock:hover {
-        background-image: url('../images/rock-purple.svg');
-    }
-    
-    .rock-paper-scissors__control-button_type_paper:hover {
-        background-image: url('../images/paper-purple.svg');
-    }
-    
-    .rock-paper-scissors__control-button_type_scissors:hover {
-        background-image: url('../images/scissors-purple.svg');
     }
 }
 
@@ -201,7 +174,6 @@
     .rock-paper-scissors__control-button {
         width: 65px;
         height: 65px;
-        background-size: 40px 40px;
     }
 }
 

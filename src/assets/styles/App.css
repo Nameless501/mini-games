@@ -1,4 +1,7 @@
-.App {
+.app {
+  --color-dark: #145f48;
+  --color-light: #e89db4;
+  
   margin: 0 auto;
   padding: 20px 0;
   max-width: 1280px;

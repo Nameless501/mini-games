@@ -1,8 +1,47 @@
-import rock from '../assets/images/rock-white.svg';
-import paper from '../assets/images/paper-white.svg';
-import scissors from '../assets/images/scissors-white.svg';
-
 // --------- general ---------
+
+export const COLORS = [
+    {
+        dark: '#145f48',
+        light: '#e89db4',
+    },
+    {
+        dark: '#ab0916',
+        light: '#4ff3e6',
+    },
+    {
+        dark: '#20324e',
+        light: '#dccaae',
+    },
+    {
+        dark: '#94afdc',
+        light: '#6e5326',
+    },
+    {
+        dark: '#570511',
+        light: '#a5f7eb',
+    },
+    {
+        dark: '#c8faa4',
+        light: '#3a085e',
+    },
+    {
+        dark: '#6f0da5',
+        light: '#8cef57',
+    },
+    {
+        dark: '#6f0da5',
+        light: '#8cef57',
+    },
+    {
+        dark: '#bb2562',
+        light: '#40d59a',
+    },
+    {
+        dark: '#25bbbf',
+        light: '#af1622',
+    }
+]
 
 export const FRAME_SIZES = {
     1280: {x: 800, y: 600},
@@ -10,10 +49,6 @@ export const FRAME_SIZES = {
     767: {x: 500, y: 350},
     550: {x: 350, y: 450},
 }
-
-export const COLOR_LIGHT = '#e89db4';
-
-export const COLOR_DARK = '#e89db4';
 
 // --------- Snake game ---------
 
@@ -59,17 +94,14 @@ export const SNAKE_MOVE_DISTANCE = 10;
 export const RPS_CONFIG = [
     {
         name: 'rock',
-        img: `${rock}`,
         beat: 'scissors',
     },
     {
         name: 'paper',
-        img: `${paper}`,
         beat: 'rock',
     },
     {
         name: 'scissors',
-        img: `${scissors}`,
         beat: 'paper',
     }
 ];

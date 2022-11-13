@@ -1,8 +1,11 @@
-import { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useContext } from 'react';
 import '../assets/styles/Canvas.css';
+import ColorContext from '../contexts/ColorContext.js';
 import ControlsFrame from './ControlsFrame.js';
-import { COLOR_DARK, COLOR_LIGHT, SNAKE_BLOCK_SIZES, SNAKE_POSSIBLE_DIRECTION, SNAKE_POSSIBLE_KEYS, SNAKE_KEY_MOVES, SNAKE_MOVE_TIME, SNAKE_DEFAULT_DIRECTION, FONT_SIZE } from '../utils/constants.js';
+import { SNAKE_BLOCK_SIZES, SNAKE_POSSIBLE_DIRECTION, SNAKE_POSSIBLE_KEYS, SNAKE_KEY_MOVES, SNAKE_MOVE_TIME, SNAKE_DEFAULT_DIRECTION, FONT_SIZE } from '../utils/constants.js';
 import { getFrameSize, getRandomNumber } from '../utils/utils.js';
+import useFiguresRender from '../hooks/useFiguresRender.js';
+import useCollisionCheck from '../hooks/useCollisionCheck.js';
 
 function Snake() {
     const [inGame, setInGame] = useState(false);
@@ -15,21 +18,57 @@ function Snake() {
     const blockWidth = useRef();
     const scoreCounter = useRef(0);
 
+// --------- color context ---------
+
+    const colors = useContext(ColorContext);
+
+// --------- custom hooks ---------
+
+    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender(colors.light);
+    const [checkFrameOverflow, checkCollision, checkSideCollision] = useCollisionCheck();
+
+// --------- initial states handlers ---------
+
+function setCanvasSize() {
+    const frame = getFrameSize();
+    canvasRef.current.width = frame.x;
+    canvasRef.current.height = frame.y;
+}
+
+function getBrickData(x, y) {
+    return {
+        top: y + 1.5, 
+        bottom: y + blockWidth.current - 1.5,
+        left: x + 1.5,
+        right: x + blockWidth.current - 1.5,
+    }
+}
+
+function getInitialSnake() {
+    const x = Math.floor((canvasRef.current.width / blockWidth.current) / 2) * blockWidth.current;
+    const y = Math.floor((canvasRef.current.height / blockWidth.current) / 2) * blockWidth.current;
+
+    const initialSnake = [
+        {x, y},
+        {x, y: y + blockWidth.current},
+        {x, y: y + blockWidth.current * 2},
+    ]
+
+    snakeRef.current = initialSnake;
+}
+
 // --------- draw handlers ---------
 
     function drawBrick(x, y, width) {
-        canvasContext.current.fillStyle = COLOR_LIGHT;
-        canvasContext.current.strokeStyle = COLOR_DARK;
-
-        canvasContext.current.fillRect(x, y, width - 3, width - 3);
+        renderRect(canvasContext.current, x, y, width - 3, width - 3);
+        canvasContext.current.strokeStyle = colors.light;
         canvasContext.current.strokeRect(x+1, y+1, 1.5, 1.5);
     }
 
     function drawSnake() {
         const width = blockWidth.current;
-
         snakeRef.current.forEach(elem => {
-            drawBrick(elem.x, elem.y, width, width);
+            drawBrick(elem.x, elem.y, width);
         })
     }
 
@@ -37,14 +76,11 @@ function Snake() {
         const width = blockWidth.current;
         const x = foodRef.current.x;
         const y = foodRef.current.y;
-
         drawBrick(x, y, width);
     }
 
     function drawScoreCounter() {
-        canvasContext.current.font = `${FONT_SIZE}px Segoe UI`;
-        canvasContext.current.fillStyle = COLOR_DARK;
-        canvasContext.current.fillText(`Score: ${scoreCounter.current}`, 10, FONT_SIZE);
+        renderText(canvasContext.current, `Score: ${scoreCounter.current}`, 10, FONT_SIZE);
     }
 
     function clearAll() {
@@ -83,10 +119,10 @@ function Snake() {
 // --------- collision handlers ---------
 
     function checkFoodCollision() {
-        const snakeHead = snakeRef.current[0];
-        const food = foodRef.current;
+        const snakeHead = getBrickData(snakeRef.current[0].x, snakeRef.current[0].y);
+        const food = getBrickData(foodRef.current.x, foodRef.current.y);
     
-        const collision = snakeHead.x === food.x && snakeHead.y === food.y;
+        const collision = checkCollision(snakeHead, food);
     
         if(collision) {
             scoreCounter.current += 1;
@@ -96,10 +132,13 @@ function Snake() {
     }
 
     function checkSelfCollision() {
-        const snakeHead = snakeRef.current[0];
+        const snakeHead = getBrickData(snakeRef.current[0].x, snakeRef.current[0].y);
         const snakeBody = snakeRef.current.slice(1);
 
-        const collision = snakeBody.some(elem => elem.x === snakeHead.x && elem.y === snakeHead.y);
+        const collision = snakeBody.some(elem => {
+            const brick = getBrickData(elem.x, elem.y);
+            return checkCollision(snakeHead, brick)
+        });
 
         if(collision) {
             handleGameOver();
@@ -107,19 +146,6 @@ function Snake() {
     }
 
 // --------- snake move handlers ---------
-
-    function getInitialSnake() {
-        const x = Math.floor((canvasRef.current.width / blockWidth.current) / 2) * blockWidth.current;
-        const y = Math.floor((canvasRef.current.height / blockWidth.current) / 2) * blockWidth.current;
-
-        const initialSnake = [
-            {x, y},
-            {x, y: y + blockWidth.current},
-            {x, y: y + blockWidth.current * 2},
-        ]
-
-        snakeRef.current = initialSnake;
-    }
 
     function setNewSnakePosition(newHead) {
         snakeRef.current = [
@@ -207,9 +233,7 @@ function Snake() {
 // --------- useLayoutEffect ---------
 
 useLayoutEffect(() => {
-    const frame = getFrameSize();
-    canvasRef.current.width = frame.x;
-    canvasRef.current.height = frame.y;
+    setCanvasSize();
 
     canvasContext.current = canvasRef.current.getContext('2d');
     blockWidth.current = SNAKE_BLOCK_SIZES[canvasRef.current.width];

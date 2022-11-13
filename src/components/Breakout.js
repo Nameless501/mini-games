@@ -1,7 +1,8 @@
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef, useLayoutEffect, useContext } from 'react';
 import '../assets/styles/Canvas.css'
+import ColorContext from '../contexts/ColorContext.js';
 import ControlsFrame from './ControlsFrame.js';
-import { COLOR_LIGHT, COLOR_DARK, PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
+import { PADDLE_WIDTH, PADDLE_HEIGHT, BALL_RADIUS, BRICK_PADDING, BRICK_HEIGHT, COLUMNS, ROWS, FONT_SIZE, BALL_VELOCITY } from '../utils/constants.js';
 import { getFrameSize } from '../utils/utils.js';
 import useFiguresRender from '../hooks/useFiguresRender.js';
 import useCollisionCheck from '../hooks/useCollisionCheck.js';
@@ -24,9 +25,13 @@ function Breakout() {
     const scoreCount = useRef(0);
     const livesCount = useRef(3);
 
+// --------- color context ---------
+
+    const colors = useContext(ColorContext);
+
 // --------- custom hooks ---------
 
-    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender();
+    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender(colors.light);
     const [checkFrameOverflow, checkCollision] = useCollisionCheck();
     const getPositionInCanvas = useMousePosition();
 
@@ -147,9 +152,9 @@ function Breakout() {
     function handleClick() {
         if(!inGame.current) {
             handleBallMove();
-        }
 
-        inGame.current = true;
+            inGame.current = true;
+        }
     }
 
     function handleControlButton(direction) {
@@ -185,6 +190,8 @@ function Breakout() {
     }
 
     function handleGameOver() {
+        cancelAnimationFrame(animation.current);
+
         setStartGame(false);
 
         resetAllStates();
