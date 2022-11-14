@@ -1,0 +1,73 @@
+.settings-button {
+    margin: 0;
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    background-color: var(--color-light);
+    border-radius: 50%;
+    border: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-button__icon {
+    margin: 0;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    transform: rotate(0deg) scale(1);
+    transition: transform .3s linear;
+}
+
+.settings-button__icon-path {
+    fill: var(--color-dark);
+}
+
+.settings-button__icon-path {
+    fill: var(--color-dark);
+}
+
+.settings-button_clicked {
+    background-color: var(--color-dark);
+    border: 1.5px solid var(--color-light);
+}
+
+.settings-button_clicked .settings-button__icon {
+    transform: rotate(270deg) scale(1.3);
+    transition: transform .3s linear;
+}
+
+.settings-button_clicked .settings-button__icon-path {
+    fill: var(--color-light);
+}
+
+@media screen and (min-width: 768px) {
+    .settings-button:hover {
+        background-color: var(--color-dark);
+        border: 1.5px solid var(--color-light);
+    }
+    
+    .settings-button:hover .settings-button__icon {
+        transform: rotate(135deg) scale(1.15);
+        transition: transform .3s linear;
+    }
+    
+    .settings-button:hover .settings-button__icon-path {
+        fill: var(--color-light);
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .settings-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .settings-button__icon {
+        width: 23px;
+        height: 23px;
+    }
+}

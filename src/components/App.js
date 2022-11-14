@@ -21,7 +21,21 @@ function App() {
 
   function handleColorsChange() {
     const newColors = getRandomColors();
-    setNewColors(newColors);
+
+    if(newColors.light === currentColors.light || newColors.light === currentColors.dark) {
+      handleColorsChange()
+    } else {
+      setNewColors(newColors);
+    }
+  }
+
+  function handleColorReverse() {
+    setNewColors(current => {
+      const light = current.dark;
+      const dark = current.light;
+
+      return {light, dark};
+    });
   }
 
   useLayoutEffect(() => {
@@ -39,7 +53,10 @@ function App() {
         >
           <Switch>
             <Route exact path='/' >
-              <Header/>
+              <Header 
+                handleColorsChange={handleColorsChange} 
+                handleColorReverse={handleColorReverse}
+              />
               <Main />
             </Route>
             <Route path='/snake' >
