@@ -547,6 +547,7 @@ function Basketball() {
 
         return (() => {
             canvasRef.current.removeEventListener('mousedown', handleMouseDown);
+            cancelAnimationFrame(animationRef.current);
         })
     }, []);
 
