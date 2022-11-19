@@ -7,13 +7,14 @@ import { getFrameSize } from '../utils/utils.js';
 import useFiguresRender from '../hooks/useFiguresRender.js';
 import useCollisionCheck from '../hooks/useCollisionCheck.js';
 import useMousePosition from '../hooks/useMousePosition.js';
+import useAnimation from '../hooks/useAnimation';
 
 function Breakout() {
     const [startGame, setStartGame] = useState(false);
     const inGame = useRef(false);
+    const pause = useRef(false);
     const canvasRef = useRef();
     const canvasContext = useRef();
-    const animation = useRef();
     const brickWidth = useRef();
     const bricks = useRef();
     const paddleX = useRef();
@@ -31,9 +32,10 @@ function Breakout() {
 
 // --------- custom hooks ---------
 
-    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender(colors.light);
-    const [checkFrameOverflow, checkCollision] = useCollisionCheck();
+    const { renderCircle, renderRect, renderText, clearCanvas }  = useFiguresRender(colors.light);
+    const { circleWithRectCollision, circleWithFrameCollision }  = useCollisionCheck();
     const getPositionInCanvas = useMousePosition();
+    const { setAnimationStart, setAnimationEnd, setAnimationPause } = useAnimation();
 
 // --------- initial states handlers ---------
 
@@ -50,10 +52,10 @@ function Breakout() {
                 const currentX = BRICK_PADDING + j * brickWidth.current;
                 const currentY  = (BRICK_PADDING * 2) + (i * (BRICK_HEIGHT + BRICK_PADDING));
                 bricks.push({
-                    left: currentX, 
-                    top: currentY,
-                    right: currentX + brickWidth.current,
-                    bottom: currentY + BRICK_HEIGHT,
+                    x: currentX + brickWidth.current / 2, 
+                    y: currentY + BRICK_HEIGHT / 2,
+                    w: brickWidth.current,
+                    h: BRICK_HEIGHT,
                     on: true
                 });
             }
@@ -63,10 +65,9 @@ function Breakout() {
 
     function getBallData() {
         return {
-            top: ballY.current - BALL_RADIUS, 
-            bottom: ballY.current + BALL_RADIUS,
-            left: ballX.current - BALL_RADIUS,
-            right: ballX.current + BALL_RADIUS,
+            x: ballX.current,
+            y: ballY.current,
+            r: BALL_RADIUS,
         }
     }
 
@@ -103,8 +104,8 @@ function Breakout() {
             if(item.on === true) {
                 renderRect(
                     canvasContext.current,
-                    item.left, 
-                    item.top, 
+                    item.x - item.w / 2, 
+                    item.y - item.h / 2, 
                     brickWidth.current - BRICK_PADDING, 
                     BRICK_HEIGHT
                 );
@@ -114,10 +115,6 @@ function Breakout() {
 
     function drawBall() {
         renderCircle(canvasContext.current, ballX.current,  ballY.current,  BALL_RADIUS);
-    }
-
-    function clearAll() {
-        canvasContext.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
 
     function drawAll() {
@@ -145,7 +142,7 @@ function Breakout() {
             ballX.current = paddleX.current + PADDLE_WIDTH / 2;
         }
 
-        clearAll();
+        clearCanvas(canvasContext.current);
         drawAll();
     }
 
@@ -168,11 +165,11 @@ function Breakout() {
             ballX.current = paddleX.current + PADDLE_WIDTH / 2;
         }
 
-        clearAll();
+        clearCanvas(canvasContext.current);
         drawAll();
     }
 
-// --------- lose and reset handlers ---------
+// --------- lose, reset and pause handlers ---------
 
     function resetAllStates() {
         inGame.current = false;
@@ -190,10 +187,8 @@ function Breakout() {
     }
 
     function handleGameOver() {
-        cancelAnimationFrame(animation.current);
-
+        setAnimationEnd();
         setStartGame(false);
-
         resetAllStates();
         resetBall();
 
@@ -207,24 +202,44 @@ function Breakout() {
 
         setTimeout(() => {
             resetBall()
-            clearAll();
+            clearCanvas(canvasContext.current);
             drawAll();
         }, 0);
     }
 
+    function handlePause() {
+        if(inGame.current) {
+            if(!pause.current) {
+                setAnimationPause(true);
+            } else {
+                setAnimationPause(false, handleBallMove);
+            }
+            pause.current = !pause.current;
+        }
+    }
+
 // --------- ball move handlers ---------
+
+    function handleDirectionChange(direction) {
+        if(direction.x) {
+            directionX.current *= -1;
+        }
+        if(direction.y) {
+            directionY.current *= -1;
+        }
+    }
 
     function checkBrickCollision() {
         let changeDirection = false;
+        const ball = getBallData();
 
         for(let i = 0; i < bricks.current.length; i++) {
-            const brick = bricks.current[i];
+            const brick = bricks.current[i]
 
             if(brick.on === true) {
-                const ball = getBallData();
-                const collision = checkCollision(ball, brick);
+                const { sideCollision } = circleWithRectCollision(ball, brick);
 
-                if(collision) {
+                if(sideCollision.top || sideCollision.bottom) {
                     brick.on = false;
                     scoreCount.current++;
                     changeDirection = true;
@@ -233,7 +248,7 @@ function Breakout() {
         }
 
         if(changeDirection) {
-            directionY.current *= -1;
+            handleDirectionChange({ y: true });
         }
 
         if(scoreCount.current === bricks.current.length) {
@@ -242,13 +257,13 @@ function Breakout() {
     }
 
     function handleBottomOverflow() {
-        cancelAnimationFrame(animation.current);
+        setAnimationEnd();
 
         resetAllStates();
 
         setTimeout(() => {
             resetBall();
-            clearAll();
+            clearCanvas(canvasContext.current);
             drawAll();
         }, 0);
 
@@ -259,16 +274,18 @@ function Breakout() {
 
     function checkFrameCollision() {
         const ball = getBallData()
-
-        const [overflowRight, overflowLeft, overflowTop, overflowBottom] = checkFrameOverflow(
+        const [overflowRight, overflowLeft, overflowTop, overflowBottom] = circleWithFrameCollision(
             ball,
             canvasRef.current.width,
             canvasRef.current.height,
-        )
+        );
 
-        directionX.current = overflowRight || overflowLeft ? (directionX.current * -1) : directionX.current;
-        directionY.current = overflowTop ? (directionY.current * -1) : directionY.current;
-
+        if(overflowRight || overflowLeft) {
+            handleDirectionChange({ x: true });
+        }
+        if(overflowTop) {
+            handleDirectionChange({ y: true });
+        }
         if(overflowBottom) {
             handleBottomOverflow();
         }
@@ -277,25 +294,18 @@ function Breakout() {
     function checkPaddleCollision() {
         if(inGame.current) {
             const paddle = {
-                top: paddleY.current, 
-                bottom: paddleY.current + PADDLE_HEIGHT,
-                left: paddleX.current,
-                right: paddleX.current + PADDLE_WIDTH,
+                y: paddleY.current + PADDLE_HEIGHT / 2, 
+                x: paddleX.current + PADDLE_WIDTH / 2,
+                w: PADDLE_WIDTH,
+                h: PADDLE_HEIGHT,
             }
             const ball = getBallData();
+            const { sideCollision } = circleWithRectCollision(ball, paddle);
 
-            const collision = checkCollision(ball, paddle);
-
-            directionY.current = collision ? (directionY.current * -1) : directionY.current;
+            if(sideCollision.top) {
+                handleDirectionChange({ y: true });
+            }
         }
-    }
-
-    function checkBallDirection() {
-        checkFrameCollision();
-
-        checkPaddleCollision();
-
-        checkBrickCollision();
     }
 
     function makeBallMove() {
@@ -304,11 +314,14 @@ function Breakout() {
     }
 
     function handleBallMove() {
-        animation.current = requestAnimationFrame(handleBallMove);
+        setAnimationStart(handleBallMove);
 
-        checkBallDirection();
+        checkFrameCollision();
+        checkPaddleCollision();
+        checkBrickCollision();
+
         makeBallMove();
-        clearAll();
+        clearCanvas(canvasContext.current);
         drawAll();
     }
 
@@ -316,9 +329,10 @@ function Breakout() {
 
     useLayoutEffect(() => {
         setCanvasSize();
+        const canvas = canvasRef.current;
 
-        canvasContext.current = canvasRef.current.getContext('2d');
-        brickWidth.current = (canvasRef.current.width - BRICK_PADDING) / COLUMNS;
+        canvasContext.current = canvas.getContext('2d');
+        brickWidth.current = (canvas.width - BRICK_PADDING) / COLUMNS;
 
         bricks.current = createBricks();
 
@@ -331,11 +345,12 @@ function Breakout() {
             window.addEventListener('mousemove', handleMousemove);
         }
         
-        canvasRef.current.addEventListener('click', handleClick);
+        canvas.addEventListener('click', handleClick);
 
         return (() => {
             window.removeEventListener('mousemove', handleMousemove);
-            canvasRef.current.removeEventListener('click', handleClick);
+            canvas.removeEventListener('click', handleClick);
+            setAnimationEnd();
         })
     }, []);
 
@@ -349,6 +364,7 @@ function Breakout() {
                 showButtons={true}
                 buttonsList={['left', 'right']}
                 handleClick={handleControlButton}
+                handlePause={handlePause}
             >
                 <canvas className='canvas' ref={canvasRef} />
             </ControlsFrame>

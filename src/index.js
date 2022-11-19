@@ -4,13 +4,17 @@ import './index.css';
 import App from './components/App.js';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter } from 'react-router-dom';
+import store from './store.js';
+import { Provider } from 'react-redux';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <HashRouter>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+    <Provider store={store}>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </Provider>
   </HashRouter>
 );
 

@@ -1,18 +1,31 @@
 function useCollisionCheck() {
-    function checkFrameOverflow(targetData, frameWidth, frameHeight) {
-        const overflowRight = targetData.right >= frameWidth;
-        const overflowLeft = targetData.left <= 0;
-        const overflowTop = targetData.top <= 0 
-        const overflowBottom = targetData.bottom >= frameHeight;
+    function rectWithFrameCollision(targetData, frameWidth, frameHeight) {
+        const left = targetData.x;
+        const right = targetData.x + targetData.w;
+        const top = targetData.y;
+        const bottom = targetData.y + targetData.h;
 
-        return [overflowRight, overflowLeft, overflowTop, overflowBottom];
+        return {
+            overflowRight: right > frameWidth,
+            overflowLeft: left < 0,
+            overflowTop: top < 0,
+            overflowBottom: bottom > frameHeight,
+        }
     }
 
-    function checkCollision(targetData, blockData) {
-        const collision = targetData.right >= blockData.left && 
-            targetData.left <= blockData.right &&
-            targetData.bottom >= blockData.top && 
-            targetData.top <= blockData.bottom;
+    function rectCollision(targetData, blockData) {
+        const targetLeft = targetData.x;
+        const targetRight = targetData.x + targetData.w;
+        const targetTop = targetData.y;
+        const targetBottom = targetData.y + targetData.h;
+
+        const blockLeft = blockData.x;
+        const blockRight = blockData.x + blockData.w;
+        const blockTop = blockData.y;
+        const blockBottom = blockData.y + blockData.h;
+
+        const collision = targetRight > blockLeft && targetLeft < blockRight &&
+            targetBottom > blockTop && targetTop < blockBottom;
 
         return collision;
     }
@@ -59,24 +72,37 @@ function useCollisionCheck() {
         const insideX = (targetData.x + targetData.r) >= blockLeft && 
         (targetData.x - targetData.r) <= blockRight;
 
-        let sideCollision = false;
-        let verticalCollision = false;
-
         if(insideY) {
-            const distance = getTriangleHeight(targetData, blockData.x, blockTop, blockData.x, blockBottom, blockData.h);
+            const leftDistance = getTriangleHeight(targetData, blockLeft, blockTop, blockLeft, blockBottom, blockData.h);
+            const rightDistance = getTriangleHeight(targetData, blockRight, blockTop, blockRight, blockBottom, blockData.h);
 
-            sideCollision = ((distance - (blockData.w / 2) - targetData.r)) < 1 ? true : false;
+            var collisionLeft = (leftDistance - targetData.r) < 1;
+            var collisionRight = (rightDistance - targetData.r) < 1;
         } 
         
         if (insideX) {
-            const distance = getTriangleHeight(targetData, blockLeft, blockData.y, blockRight, blockData.y, blockData.w);
+            const topDistance = getTriangleHeight(targetData, blockRight, blockTop, blockLeft, blockTop, blockData.w);
+            const bottomDistance = getTriangleHeight(targetData, blockRight, blockBottom, blockLeft, blockBottom, blockData.w);
 
-            verticalCollision = ((distance - (blockData.h / 2) - targetData.r)) < 1 ? true : false;
+            var collisionTop = (topDistance - targetData.r) < 1;
+            var collisionBottom = (bottomDistance - targetData.r) < 1;
         }
 
-        const cornerCollision = leftTopCorner < 1 || rightTopCorner < 1 || leftBottomCorner < 1 || rightBottomCorner < 1;
+        const sideCollision = {
+            top: collisionTop,
+            bottom: collisionBottom,
+            left: collisionLeft,
+            right: collisionRight,
+        }
 
-        return [sideCollision, verticalCollision, cornerCollision];
+        const cornerCollision = {
+            leftTopCorner: leftTopCorner < 1, 
+            rightTopCorner: rightTopCorner < 1,
+            leftBottomCorner: leftBottomCorner < 1,
+            rightBottomCorner: rightBottomCorner < 1,
+        }
+
+        return { sideCollision, cornerCollision };
     }
 
     function circleWithFrameCollision(ball, frameWidth, frameHeight) {
@@ -88,7 +114,7 @@ function useCollisionCheck() {
         return [overflowRight, overflowLeft, overflowTop, overflowBottom];
     }
 
-    return [checkFrameOverflow, checkCollision, circleWithRectCollision, circleWithFrameCollision];
+    return { rectWithFrameCollision, rectCollision, circleWithRectCollision, circleWithFrameCollision };
 }
 
 export default useCollisionCheck;

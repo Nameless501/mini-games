@@ -7,12 +7,13 @@ import { getFrameSize } from '../utils/utils.js';
 import useFiguresRender from '../hooks/useFiguresRender.js';
 import useCollisionCheck from '../hooks/useCollisionCheck.js';
 import useMousePosition from '../hooks/useMousePosition.js';
+import useAnimation from '../hooks/useAnimation';
 
 function Basketball() {
+    const pause = useRef(false);
     const inGame = useRef(false);
     const canvasRef = useRef();
     const canvasContext = useRef();
-    const animationRef = useRef();
     const ballX = useRef();
     const ballY = useRef();
     const initialBallX = useRef();
@@ -33,9 +34,10 @@ function Basketball() {
 
 // --------- custom hooks ---------
 
-    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender(colors.light);
-    const [checkFrameOverflow, checkCollision, circleWithRectCollision, circleWithFrameCollision] = useCollisionCheck();
+    const { renderCircle, renderRect, renderText, clearCanvas } = useFiguresRender(colors.light);
+    const { circleWithRectCollision, circleWithFrameCollision } = useCollisionCheck();
     const getPositionInCanvas = useMousePosition();
+    const { setAnimationStart, setAnimationEnd, setAnimationPause } = useAnimation();
 
 // --------- initial states handlers ---------
 
@@ -187,16 +189,8 @@ function Basketball() {
         canvasContext.current.lineTo(targetX.current + 65, targetY.current + 32,5);
         canvasContext.current.lineTo(targetX.current + 35, targetY.current + 2);
         canvasContext.current.lineTo(targetX.current + 5, targetY.current + 32.5);
-        canvasContext.current.moveTo(targetX.current + 5, targetY.current + 50);
-        canvasContext.current.lineTo(targetX.current + 50, targetY.current + 2);
-        canvasContext.current.moveTo(targetX.current + 65, targetY.current + 50);
-        canvasContext.current.lineTo(targetX.current + 20, targetY.current + 2);
         canvasContext.current.stroke();
         canvasContext.current.closePath();
-    }
-
-    function clearAll() {
-        canvasContext.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
 
     function drawAll() {
@@ -240,21 +234,23 @@ function Basketball() {
 
         getVelocity();
 
-        window.requestAnimationFrame(drawAllWithGuide);
-        clearAll();
-    } 
+        setAnimationStart(drawAllWithGuide);
+
+        clearCanvas(canvasContext.current);
+    }
 
     // V for tests V
 
-    /* function handleMouseMove(evt) {
-        const [x, y] = getPositionInCanvas(evt, canvasRef.current);
+    // function handleMouseMove(evt) {
+    //     const [x, y] = getPositionInCanvas(evt, canvasRef.current);
 
-        ballX.current = x;
-        ballY.current = y;
+    //     ballX.current = x;
+    //     ballY.current = y;
 
-        window.requestAnimationFrame(drawAllWithGuide);
-        clearAll();
-    } */
+    //     setAnimationStart(drawAllWithGuide);
+
+    //     clearCanvas(canvasContext.current);
+    // }   
 
     function checkClickOnBall(evt) {
         const [x, y] = getPositionInCanvas(evt, canvasRef.current);
@@ -304,10 +300,10 @@ function Basketball() {
         }
     }
 
-// --------- lose and reset handlers ---------
+// --------- lose, reset and pause handlers ---------
 
     function resetBall() {
-        cancelAnimationFrame(animationRef.current);
+        setAnimationEnd();
 
         inGame.current = false;
         goal.current = false;
@@ -317,13 +313,24 @@ function Basketball() {
         energy.current = 10;
 
         setInitialBallPosition();
-        clearAll();
+        clearCanvas(canvasContext.current);
         drawAll();
     }
 
     function resetAllStates() {
         resetBall();
         score.current = 0;
+    }
+
+    function handlePause() {
+        if(inGame.current) {
+            if(!pause.current) {
+                setAnimationPause(true);
+            } else {
+                setAnimationPause(false);
+            }
+            pause.current = !pause.current;
+        }
     }
 
 // --------- ball direction handlers ---------
@@ -347,10 +354,10 @@ function Basketball() {
     function handleMultipleCollisions(currentCollision, callback) {
         if(prevCollision.current !== currentCollision) {
             prevCollision.current = currentCollision;
-            collisionTimeout.current = 10;
+            collisionTimeout.current = 5;
             callback();
         } else if(prevCollision.current === currentCollision && collisionTimeout.current === 0) {
-            collisionTimeout.current = 10;
+            collisionTimeout.current = 5;
             callback();
         }
     }
@@ -377,6 +384,15 @@ function Basketball() {
         }
     }
 
+    function handleCollision(collisionData, collisionSite) {
+        if(collisionData.left || collisionData.right) {
+            handleMultipleCollisions(`${collisionSite}Side`, handleHorizontalDirectionChange);
+        }
+        if(collisionData.top || collisionData.bottom) {
+            handleMultipleCollisions(`${collisionSite}Vertical`, handleVerticalDirectionChange);
+        }
+    }
+
     function checkShieldCollision() {
         const ball = getBallData();
         const shield = {
@@ -385,15 +401,9 @@ function Basketball() {
             h: 90,
             w: 10,
         }
-        const [sideCollision, verticalCollision, cornerCollision] = circleWithRectCollision(ball, shield);
+        const { sideCollision } = circleWithRectCollision(ball, shield);
 
-        if(cornerCollision) {
-            handleMultipleCollisions('shield', handleBothDirectionsChange);
-        } else if(sideCollision) {
-            handleMultipleCollisions('shield', handleHorizontalDirectionChange);
-        } else if(verticalCollision) {
-            handleMultipleCollisions('shield', handleVerticalDirectionChange);
-        }
+        handleCollision(sideCollision, 'shield');
     }
 
     function checkBasketCollisionRight() {
@@ -404,15 +414,9 @@ function Basketball() {
             h: 7,
             w: 15,
         }
-        const [sideCollision, verticalCollision, cornerCollision] = circleWithRectCollision(ball, basketBorder);
+        const { sideCollision } = circleWithRectCollision(ball, basketBorder);
 
-        if(cornerCollision) {
-            handleMultipleCollisions('borderRight', handleBothDirectionsChange);
-        } else if(sideCollision) {
-            handleMultipleCollisions('borderRight', handleHorizontalDirectionChange);
-        } else if(verticalCollision) {
-            handleMultipleCollisions('borderRight', handleVerticalDirectionChange);
-        }
+        handleCollision(sideCollision, 'basketRight');
     }
 
     function checkBasketCollisionLeft() {
@@ -423,46 +427,15 @@ function Basketball() {
             h: 7,
             w: 5,
         }
-        const [sideCollision, verticalCollision, cornerCollision] = circleWithRectCollision(ball, basketBorder);
+        const { sideCollision } = circleWithRectCollision(ball, basketBorder);
 
-        if(cornerCollision) {
-            handleMultipleCollisions('borderLeft', handleBothDirectionsChange);
-        } else if(sideCollision) {
-            handleMultipleCollisions('borderLeft', handleHorizontalDirectionChange);
-        } else if(verticalCollision) {
-            handleMultipleCollisions('borderLeft', handleVerticalDirectionChange);
-        }
-    }
-
-    function checkNetCollision() {
-        const ball = getBallData();
-        const netLeft = {
-            x: targetX.current + 5,
-            y: targetY.current + 35,
-            h: 70,
-            w: 1,
-        }
-        const netRight = {
-            x: targetX.current + 70,
-            y: targetY.current + 35,
-            h: 70,
-            w: 1,
-        }
-        const [netLeftSideCollision, netLeftVerticalCollision, netLeftCornerCollision] = circleWithRectCollision(ball, netLeft);
-        const [netRightSideCollision, netRightVerticalCollision, netRightCornerCollision] = circleWithRectCollision(ball, netRight);
-
-        if(netLeftSideCollision) {
-            handleMultipleCollisions('borderLeft', handleHorizontalDirectionChange);
-        } else if (netRightSideCollision) {
-            handleMultipleCollisions('borderRight', handleHorizontalDirectionChange);
-        }
+        handleCollision(sideCollision, 'basketLeft');
     }
 
     function checkBasketCollision() {
         checkShieldCollision();
         checkBasketCollisionRight();
         checkBasketCollisionLeft();
-        checkNetCollision();
     }
 
     function checkGoal() {
@@ -473,9 +446,9 @@ function Basketball() {
             h: 10,
             w: 60,
         }
-        const [sideCollision, verticalCollision, cornerCollision] = circleWithRectCollision(ball, basket);
+        const { sideCollision } = circleWithRectCollision(ball, basket);
         
-        if(verticalCollision) {
+        if(sideCollision.top) {
             goal.current = true;
         }
     }
@@ -513,16 +486,16 @@ function Basketball() {
 
     function handleBallMove() {
         if (energy.current > 0) {
-            animationRef.current = window.requestAnimationFrame(handleBallMove);
+            setAnimationStart(handleBallMove);
 
             checkFrameCollision();
             checkBasketCollision();
             checkGoal();
 
             handleGravity();
-            
             makeBallMove();
-            clearAll();
+
+            clearCanvas(canvasContext.current);
             drawAll();
 
             collisionTimeout.current = collisionTimeout.current > 0 ? collisionTimeout.current - 1 : 0;
@@ -547,16 +520,18 @@ function Basketball() {
 
         return (() => {
             canvasRef.current.removeEventListener('mousedown', handleMouseDown);
-            cancelAnimationFrame(animationRef.current);
+            
+            setAnimationEnd();
         })
     }, []);
 
-// JSX
+// --------- JSX ---------
 
     return (
         <>
             <ControlsFrame 
                 inGame={true}
+                handlePause={handlePause}
             >
                 <canvas className='canvas' ref={canvasRef} />
             </ControlsFrame>

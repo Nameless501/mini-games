@@ -28,7 +28,14 @@ function useFiguresRender(currentColor) {
         canvas.fillText(text, x, y);
     }
 
-    return [renderCircle, renderRect, renderEllipse, renderText];
+    function clearCanvas(canvasContext) {
+        const width = canvasContext.canvas.offsetWidth;
+        const height = canvasContext.canvas.offsetHeight;
+
+        canvasContext.clearRect(0, 0, width, height);
+    }
+
+    return { renderCircle, renderRect, renderEllipse, renderText, clearCanvas };
 }
 
 export default useFiguresRender;

@@ -24,8 +24,8 @@ function Snake() {
 
 // --------- custom hooks ---------
 
-    const [renderCircle, renderRect, renderEllipse, renderText] = useFiguresRender(colors.light);
-    const [checkFrameOverflow, checkCollision, checkSideCollision] = useCollisionCheck();
+    const { renderRect, renderText, clearCanvas } = useFiguresRender(colors.light);
+    const { rectWithFrameCollision, rectCollision } = useCollisionCheck();
 
 // --------- initial states handlers ---------
 
@@ -35,23 +35,15 @@ function setCanvasSize() {
     canvasRef.current.height = frame.y;
 }
 
-function getBrickData(x, y) {
-    return {
-        top: y + 1.5, 
-        bottom: y + blockWidth.current - 1.5,
-        left: x + 1.5,
-        right: x + blockWidth.current - 1.5,
-    }
-}
-
 function getInitialSnake() {
     const x = Math.floor((canvasRef.current.width / blockWidth.current) / 2) * blockWidth.current;
     const y = Math.floor((canvasRef.current.height / blockWidth.current) / 2) * blockWidth.current;
+    const w = blockWidth.current;
 
     const initialSnake = [
-        {x, y},
-        {x, y: y + blockWidth.current},
-        {x, y: y + blockWidth.current * 2},
+        {x, y, w, h: w},
+        {x, y: y + blockWidth.current, w, h: w},
+        {x, y: y + blockWidth.current * 2, w, h: w},
     ]
 
     snakeRef.current = initialSnake;
@@ -60,20 +52,17 @@ function getInitialSnake() {
 // --------- draw handlers ---------
 
     function drawBrick(x, y, width) {
-        renderRect(canvasContext.current, x, y, width - 3, width - 3);
-        canvasContext.current.strokeStyle = colors.light;
-        canvasContext.current.strokeRect(x+1, y+1, 1.5, 1.5);
+        renderRect(canvasContext.current, x + 1, y + 1, width - 2, width - 2);
     }
 
     function drawSnake() {
-        const width = blockWidth.current;
         snakeRef.current.forEach(elem => {
-            drawBrick(elem.x, elem.y, width);
+            drawBrick(elem.x, elem.y, elem.w);
         })
     }
 
     function drawFood() {
-        const width = blockWidth.current;
+        const width = foodRef.current.w;
         const x = foodRef.current.x;
         const y = foodRef.current.y;
         drawBrick(x, y, width);
@@ -81,10 +70,6 @@ function getInitialSnake() {
 
     function drawScoreCounter() {
         renderText(canvasContext.current, `Score: ${scoreCounter.current}`, 10, FONT_SIZE);
-    }
-
-    function clearAll() {
-        canvasContext.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }
 
     function drawAll() {
@@ -116,14 +101,11 @@ function getInitialSnake() {
         setInGame((current) => !current);
     }
 
-// --------- collision handlers ---------
+// --------- collision handlers and frame overflow ---------
 
-    function checkFoodCollision() {
-        const snakeHead = getBrickData(snakeRef.current[0].x, snakeRef.current[0].y);
-        const food = getBrickData(foodRef.current.x, foodRef.current.y);
-    
-        const collision = checkCollision(snakeHead, food);
-    
+    function checkFoodCollision() {   
+        const collision = rectCollision(snakeRef.current[0], foodRef.current);
+
         if(collision) {
             scoreCounter.current += 1;
             getRandomFoodPosition();
@@ -132,12 +114,8 @@ function getInitialSnake() {
     }
 
     function checkSelfCollision() {
-        const snakeHead = getBrickData(snakeRef.current[0].x, snakeRef.current[0].y);
-        const snakeBody = snakeRef.current.slice(1);
-
-        const collision = snakeBody.some(elem => {
-            const brick = getBrickData(elem.x, elem.y);
-            return checkCollision(snakeHead, brick)
+        const collision = snakeRef.current.slice(1).some(elem => {
+            return rectCollision(snakeRef.current[0], elem);
         });
 
         if(collision) {
@@ -145,43 +123,47 @@ function getInitialSnake() {
         }
     }
 
-// --------- snake move handlers ---------
+    function checkFrameOverflow() {
+        const head = snakeRef.current[0];
+        const {
+            overflowRight,
+            overflowLeft,
+            overflowTop,
+            overflowBottom,
+        } = rectWithFrameCollision(head, canvasRef.current.width, canvasRef.current.height);
 
-    function setNewSnakePosition(newHead) {
-        snakeRef.current = [
-            newHead,
-            ...snakeRef.current
-        ]
-
-        const tail = snakeRef.current.pop();
-        tailRef.current = tail;
+        if(overflowRight) {
+            head.x = 0;
+        } else if(overflowLeft) {
+            head.x = canvasRef.current.width - blockWidth.current;
+        } else if(overflowTop) {
+            head.y = canvasRef.current.height - blockWidth.current;
+        } else if(overflowBottom) {
+            head.y = 0;
+        }
     }
+
+// --------- snake move handlers ---------
 
     function getNewSnakePosition(axis, direction) {
         const newHead = { ...snakeRef.current[0] };
         newHead[axis] += blockWidth.current * direction;
 
-        const overflowX = newHead.x < 0 || newHead.x >= canvasRef.current.width;
-        const overflowY = newHead.y < 0 || newHead.y >= canvasRef.current.height;
+        snakeRef.current = [
+            newHead,
+            ...snakeRef.current
+        ]
+        tailRef.current = snakeRef.current.pop();
 
-        if(overflowX) {
-            newHead.x = newHead.x < 0 ? (canvasRef.current.width - blockWidth.current) : 0;
-        } else if(overflowY) {
-            newHead.y = newHead.y < 0 ? (canvasRef.current.height - blockWidth.current) : 0;
-        }
-        
-        setNewSnakePosition(newHead);
+        checkFrameOverflow();
     }
 
     function makeSnakeMove() {
         const [axis, currentDirection] = direction.current;
-        
         getNewSnakePosition(axis, currentDirection);
-
         checkFoodCollision();
         checkSelfCollision();
-
-        clearAll();
+        clearCanvas(canvasContext.current);
         drawAll();
     }
 
@@ -192,21 +174,24 @@ function getInitialSnake() {
         ]
     }
 
-// --------- random food position ---------
+// --------- get random food position ---------
 
     function getRandomFoodPosition() {
         const columns = Math.floor(canvasRef.current.width / blockWidth.current);
         const rows = Math.floor(canvasRef.current.height / blockWidth.current);
 
-        const x = getRandomNumber(0, columns) * blockWidth.current;
-        const y = getRandomNumber(0, rows) * blockWidth.current;
-
-        const collision = snakeRef.current.some(item => item.x === x && item.y === y);
+        const food = {
+            x: getRandomNumber(0, columns) * blockWidth.current,
+            y: getRandomNumber(0, rows) * blockWidth.current,
+            w: blockWidth.current, 
+            h: blockWidth.current,
+        }
+        const collision = snakeRef.current.some(elem => rectCollision(elem, food));
 
         if(collision) {
             getRandomFoodPosition();
         } else {
-            foodRef.current = {x, y};
+            foodRef.current = food;
         }
     }
 
@@ -239,8 +224,7 @@ useLayoutEffect(() => {
     blockWidth.current = SNAKE_BLOCK_SIZES[canvasRef.current.width];
 
     resetAllStates();
-
-    clearAll();
+    clearCanvas(canvasContext.current);
     drawAll();
 
     window.addEventListener('keydown', handleKeydown);
