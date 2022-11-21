@@ -33,14 +33,14 @@
     width: 20%;
 }
 
-.control-button_up {
+.control-button_ArrowUp {
     transform: rotate(90deg);
 }
 
-.control-button_down {
+.control-button_ArrowDown {
     transform: rotate(-90deg);
 }
 
-.control-button_right {
+.control-button_ArrowRight {
     transform: rotate(180deg);
 }

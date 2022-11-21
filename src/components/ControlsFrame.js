@@ -55,7 +55,7 @@ function ControlsFrame({ inGame, setStart, score, showButtons=false, buttonsList
                                 return (
                                     <li key={ind} >
                                         <ControlButton 
-                                            direction={item} 
+                                            keyCode={item} 
                                             handleClick={handleClick}
                                         />
                                     </li>

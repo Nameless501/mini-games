@@ -1,14 +1,14 @@
 import '../assets/styles/ControlButton.css';
 
-function ControlButton({ direction, handleClick }) {
+function ControlButton({ keyCode, handleClick }) {
     function onClick() {
-        handleClick(direction);
+        handleClick(keyCode);
     }
 
     return (
         <button 
             type="button"
-            className={`control-button control-button_${direction}`} 
+            className={`control-button control-button_${keyCode}`} 
             onClick={onClick}
         >
             <div className="control-button__line" />
